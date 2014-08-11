@@ -31,7 +31,7 @@ struct TestListener
 		}
 		else if(e.x < 0)
 		{
-			e.setCancelled(true);
+			e.cancelled(true);
 		}
 	}
 	virtual void onEvent(TestEvent const &e) override
