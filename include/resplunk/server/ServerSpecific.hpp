@@ -18,11 +18,11 @@ namespace resplunk
 
 			virtual Server &server() final
 			{
-				return server;
+				return serv;
 			}
 			virtual Server const &server() const final
 			{
-				return server;
+				return serv;
 			}
 
 		protected:

@@ -1,7 +1,9 @@
 #ifndef resplunk_server_Server_HeaderPlusPlus
 #define resplunk_server_Server_HeaderPlusPlus
 
-#include "resplunk/event/Events.hpp"
+#include "resplunk/event/DestructEvent.hpp"
+
+#include <set>
 
 namespace resplunk
 {

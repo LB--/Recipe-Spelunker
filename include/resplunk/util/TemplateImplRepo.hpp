@@ -43,9 +43,11 @@ namespace resplunk
 				Impls_t::iterator it = impls.find(t);
 				if(it != impls.end())
 				{
-					return it->second->r;
+					return dynamic_cast<Impl &>(*it->second.get()).r;
 				}
-				return impls.emplace(t, new Impl).first->second->r;
+				Impl *impl = new Impl;
+				impls.emplace(Impls_t::value_type{t, Impls_t::mapped_type{impl}});
+				return impl->r;
 			}
 		};
 		inline TemplateImplRepo::ImplBase::~ImplBase() = default;
