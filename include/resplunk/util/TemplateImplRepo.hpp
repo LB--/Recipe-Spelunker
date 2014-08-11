@@ -1,5 +1,5 @@
-#ifndef ResplunkUtilTemplateImlementationRepository_HeaderPlusPlus
-#define ResplunkUtilTemplateImlementationRepository_HeaderPlusPlus
+#ifndef resplunk_util_TemplateImplRepo_HeaderPlusPlus
+#define resplunk_util_TemplateImplRepo_HeaderPlusPlus
 
 #include <cstdint>
 #include <typeinfo>

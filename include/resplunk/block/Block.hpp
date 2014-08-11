@@ -1,5 +1,5 @@
-#ifndef ResplunkBlockBlock_HeaderPlusPlus
-#define ResplunkBlockBlock_HeaderPlusPlus
+#ifndef resplunk_block_Block_HeaderPlusPlus
+#define resplunk_block_Block_HeaderPlusPlus
 
 #include "resplunk/util/Location.hpp"
 

@@ -1,5 +1,5 @@
-#ifndef ResplunkEntityEntity_HeaderPlusPlus
-#define ResplunkEntityEntity_HeaderPlusPlus
+#ifndef resplunk_entity_Entity_HeaderPlusPlus
+#define resplunk_entity_Entity_HeaderPlusPlus
 
 #include "resplunk/world/World.hpp"
 
@@ -7,7 +7,8 @@ namespace resplunk
 {
 	namespace entity
 	{
-		struct Entity : world::Inhabitant
+		struct Entity
+		: world::Inhabitant
 		{
 			//
 			virtual ~Entity() = 0;

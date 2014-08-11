@@ -1,5 +1,5 @@
-#ifndef ResplunkUtilLocation_HeaderPlusPlus
-#define ResplunkUtilLocation_HeaderPlusPlus
+#ifndef resplunk_util_Location_HeaderPlusPlus
+#define resplunk_util_Location_HeaderPlusPlus
 
 #include <initializer_list>
 

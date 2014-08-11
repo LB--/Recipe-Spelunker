@@ -1,6 +1,7 @@
-#ifndef ResplunkWorldWorld_HeaderPlusPlus
-#define ResplunkWorldWorld_HeaderPlusPlus
+#ifndef resplunk_world_World_HeaderPlusPlus
+#define resplunk_world_World_HeaderPlusPlus
 
+#include "resplunk/server/ServerSpecific.hpp"
 #include "resplunk/util/Location.hpp"
 
 #include <functional>
@@ -9,37 +10,38 @@ namespace resplunk
 {
 	namespace world
 	{
-		struct World
+		struct World : virtual server::ServerSpecific
 		{
 			//...
 
-			struct Inhabitant
+			struct Inhabitant : virtual server::ServerSpecific
 			{
 				using Location = util::Location<long double>;
 				Inhabitant(World &w, Location const &loc)
-				: world(w)
+				: w(w)
+				//
 				{
 				}
 				virtual ~Inhabitant() = 0;
 
-				virtual World &getWorld() final
+				virtual World &world() final
 				{
-					return world;
+					return w;
 				}
-				virtual World const &getWorld() const final
+				virtual World const &world() const final
 				{
-					return world;
+					return w;
 				}
 
 			protected:
-				virtual void setWorld(World &w) final
+				virtual void setWorld(World &wld) final
 				{
 					//
-					world = w;
+					w = wld;
 				}
 
 			private:
-				std::reference_wrapper<World> world;
+				std::reference_wrapper<World> w;
 			};
 
 		private:
