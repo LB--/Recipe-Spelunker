@@ -3,6 +3,7 @@
 
 #include "resplunk/event/ConstructEvent.hpp"
 #include "resplunk/event/DestructEvent.hpp"
+#include "resplunk/util/SpecificToEvent.hpp"
 
 #include <set>
 
@@ -14,6 +15,8 @@ namespace resplunk
 		{
 			using ConstructEvent = event::ConstructEvent<Server>;
 			using DestructEvent = event::DestructEvent<Server>;
+			using Specific = util::SpecificTo<Server>;
+			using SpecificEvent = util::SpecificToEvent<Server>;
 			Server() noexcept;
 			Server(Server const &) = delete;
 			Server &operator=(Server const &) = delete;
