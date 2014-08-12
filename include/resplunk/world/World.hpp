@@ -1,7 +1,7 @@
 #ifndef resplunk_world_World_HeaderPlusPlus
 #define resplunk_world_World_HeaderPlusPlus
 
-#include "resplunk/server/ServerSpecific.hpp"
+#include "resplunk/util/Cloneable.hpp"
 #include "resplunk/util/Location.hpp"
 
 #include <functional>
@@ -10,11 +10,12 @@ namespace resplunk
 {
 	namespace world
 	{
-		struct World : virtual server::ServerSpecific
+		struct World
 		{
 			//...
 
-			struct Inhabitant : virtual server::ServerSpecific
+			struct Inhabitant
+			: CloneImplementor<Inhabitant>
 			{
 				using Location = util::Location<long double>;
 				Inhabitant(World &w, Location const &loc)

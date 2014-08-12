@@ -9,6 +9,7 @@ namespace resplunk
 	{
 		struct Entity
 		: world::Inhabitant
+		, util::CloneImplementor<Entity>
 		{
 			//
 			virtual ~Entity() = 0;

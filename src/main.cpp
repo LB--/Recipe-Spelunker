@@ -96,7 +96,7 @@ private:
 
 int main(int nargs, char **args) noexcept
 {
-	LambdaEventProcessor<Event> le
+	LambdaEventProcessor<Event> lep
 	{
 		[](Event &e)
 		{

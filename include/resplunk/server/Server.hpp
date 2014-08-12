@@ -21,6 +21,15 @@ namespace resplunk
 			Server &operator=(Server &&) = delete;
 			virtual ~Server() noexcept = 0;
 
+			friend bool operator==(Server const &a, Server const &b) noexcept
+			{
+				return std::addressof(a) == std::addressof(b);
+			}
+			friend bool operator!=(Server const &a, Server const &b) noexcept
+			{
+				return !(a == b);
+			}
+
 			//
 		};
 	}
