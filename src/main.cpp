@@ -1,25 +1,25 @@
 #include "resplunk/event/CancellableEvent.hpp"
-#include "resplunk/server/Server.hpp"
 
 #include <iostream>
 
 using CancellableEvent = resplunk::event::CancellableEvent;
 template<typename... Args>
 using EventImplementor = resplunk::event::EventImplementor<Args...>;
-using Server = resplunk::server::Server;
-using ServerSpecific = resplunk::server::ServerSpecific;
 template<typename... Args>
 using EventProcessor = resplunk::event::EventProcessor<Args...>;
 template<typename... Args>
 using EventReactor = resplunk::event::EventReactor<Args...>;
+template<typename... Args>
+using LambdaEventProcessor = resplunk::event::LambdaEventProcessor<Args...>;
+using Event = resplunk::event::Event;
+using ListenerPriority = resplunk::event::ListenerPriority;
 
 struct TestEvent
 : EventImplementor<TestEvent, CancellableEvent>
 {
 	int x;
-	TestEvent(Server &s, int x)
-	: ServerSpecific(s)
-	, x(x)
+	TestEvent(int x)
+	: x(x)
 	{
 	}
 };
@@ -28,14 +28,13 @@ struct TestListener
 : EventProcessor<TestEvent>
 , EventReactor<TestEvent>
 {
-	TestListener(Server &s)
-	: ServerSpecific(s)
+	TestListener()
 	{
 	}
 
 	virtual void onEvent(TestEvent &e) const override
 	{
-		std::cout << std::endl << "P x = " << e.x << std::endl;
+		std::cout << "P x = " << e.x << std::endl;
 		if(e.x > 10)
 		{
 			e.x = 10;
@@ -54,18 +53,16 @@ struct TestListener
 struct TestEventA
 : EventImplementor<TestEventA, TestEvent>
 {
-	TestEventA(Server &s)
-	: ServerSpecific(s)
-	, TestEvent(s, 1)
+	TestEventA()
+	: TestEvent(1)
 	{
 	}
 };
 struct TestEventB
 : EventImplementor<TestEventB, TestEvent>
 {
-	TestEventB(Server &s)
-	: ServerSpecific(s)
-	, TestEvent(s, 2)
+	TestEventB()
+	: TestEvent(2)
 	{
 	}
 };
@@ -73,26 +70,25 @@ struct TestEventB
 struct DerivedTestEvent
 : EventImplementor<DerivedTestEvent, TestEventA, TestEventB>
 {
-	DerivedTestEvent(Server &s)
-	: ServerSpecific(s)
-	, TestEvent(s, 4)
-	, TestEventA(s)
-	, TestEventB(s)
+	DerivedTestEvent()
+	: TestEvent(4)
 	{
 	}
 };
 
-struct TestServer
-: Server
-{
-};
-
 int main(int nargs, char **args)
 {
-	TestServer s;
-	TestListener l {s};
-	TestEvent{s, 7}.call();
-	TestEvent{s, -1}.call();
-	TestEvent{s, 14}.call();
-	DerivedTestEvent{s}.call();
+	LambdaEventProcessor<Event> le
+	{
+		[](Event &e)
+		{
+			std::cout << std::endl << "E @ " << &e << std::endl;
+		},
+		ListenerPriority::FIRST
+	};
+	TestListener l;
+	TestEvent{7}.call();
+	TestEvent{-1}.call();
+	TestEvent{14}.call();
+	DerivedTestEvent{}.call();
 }

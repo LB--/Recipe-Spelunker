@@ -10,7 +10,7 @@ namespace resplunk
 		}
 		Server::~Server()
 		{
-			DestructEvent(*this, *this).call();
+			DestructEvent(*this).call();
 			//
 		}
 	}
