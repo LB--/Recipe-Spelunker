@@ -3,28 +3,39 @@
 
 #include <iostream>
 
+using CancellableEvent = resplunk::event::CancellableEvent;
+template<typename... Args>
+using EventImplementor = resplunk::event::EventImplementor<Args...>;
+using Server = resplunk::server::Server;
+using ServerSpecific = resplunk::server::ServerSpecific;
+template<typename... Args>
+using EventProcessor = resplunk::event::EventProcessor<Args...>;
+template<typename... Args>
+using EventReactor = resplunk::event::EventReactor<Args...>;
+
 struct TestEvent
-: resplunk::event::EventImplementor<TestEvent, resplunk::event::CancellableEvent>
+: EventImplementor<TestEvent, CancellableEvent>
 {
 	int x;
-	TestEvent(resplunk::server::Server &s, int x)
-	: resplunk::server::ServerSpecific(s)
+	TestEvent(Server &s, int x)
+	: ServerSpecific(s)
 	, x(x)
 	{
 	}
 };
 
 struct TestListener
-: resplunk::event::EventProcessor<TestEvent>
-, resplunk::event::EventReactor<TestEvent>
+: EventProcessor<TestEvent>
+, EventReactor<TestEvent>
 {
-	TestListener(resplunk::server::Server &s)
-	: resplunk::server::ServerSpecific(s)
+	TestListener(Server &s)
+	: ServerSpecific(s)
 	{
 	}
 
 	virtual void onEvent(TestEvent &e) const override
 	{
+		std::cout << std::endl << "P x = " << e.x << std::endl;
 		if(e.x > 10)
 		{
 			e.x = 10;
@@ -36,34 +47,34 @@ struct TestListener
 	}
 	virtual void onEvent(TestEvent const &e) override
 	{
-		std::cout << "x = " << e.x << std::endl;
+		std::cout << "R x = " << e.x << std::endl;
 	}
 };
 
 struct TestEventA
-: resplunk::event::EventImplementor<TestEventA, TestEvent>
+: EventImplementor<TestEventA, TestEvent>
 {
-	TestEventA(resplunk::server::Server &s)
-	: resplunk::server::ServerSpecific(s)
+	TestEventA(Server &s)
+	: ServerSpecific(s)
 	, TestEvent(s, 1)
 	{
 	}
 };
 struct TestEventB
-: resplunk::event::EventImplementor<TestEventB, TestEvent>
+: EventImplementor<TestEventB, TestEvent>
 {
-	TestEventB(resplunk::server::Server &s)
-	: resplunk::server::ServerSpecific(s)
+	TestEventB(Server &s)
+	: ServerSpecific(s)
 	, TestEvent(s, 2)
 	{
 	}
 };
 
 struct DerivedTestEvent
-: resplunk::event::EventImplementor<DerivedTestEvent, TestEventA, TestEventB>
+: EventImplementor<DerivedTestEvent, TestEventA, TestEventB>
 {
-	DerivedTestEvent(resplunk::server::Server &s)
-	: resplunk::server::ServerSpecific(s)
+	DerivedTestEvent(Server &s)
+	: ServerSpecific(s)
 	, TestEvent(s, 4)
 	, TestEventA(s)
 	, TestEventB(s)
@@ -72,7 +83,7 @@ struct DerivedTestEvent
 };
 
 struct TestServer
-: resplunk::server::Server
+: Server
 {
 };
 
