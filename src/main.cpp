@@ -31,10 +31,6 @@ struct TestListener
 : EventProcessor<TestEvent>
 , EventReactor<TestEvent>
 {
-	TestListener() noexcept
-	{
-	}
-
 	virtual void onEvent(TestEvent &e) const noexcept override
 	{
 		std::cout << "P x = " << e.x << std::endl;
