@@ -1,15 +1,15 @@
-#ifndef resplunk_event_ServerSpecificEvent_HeaderPlusPlus
-#define resplunk_event_ServerSpecificEvent_HeaderPlusPlus
+#ifndef resplunk_server_ServerSpecificEvent_HeaderPlusPlus
+#define resplunk_server_ServerSpecificEvent_HeaderPlusPlus
 
 #include "resplunk/event/Event.hpp"
 #include "resplunk/server/ServerSpecific.hpp"
 
 namespace resplunk
 {
-	namespace event
+	namespace server
 	{
 		struct ServerSpecificEvent
-		: EventImplementor<ServerSpecificEvent, Event>
+		: event::EventImplementor<ServerSpecificEvent, event::Event>
 		, virtual ServerSpecific
 		{
 			virtual ~ServerSpecificEvent() = 0;
