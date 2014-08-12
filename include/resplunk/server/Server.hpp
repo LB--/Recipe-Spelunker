@@ -11,6 +11,8 @@ namespace resplunk
 {
 	namespace server
 	{
+		struct Client;
+
 		struct Server
 		{
 			using ConstructEvent = event::ConstructEvent<Server>;
