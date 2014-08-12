@@ -73,8 +73,8 @@ struct TestEventB
 struct DerivedTestEvent
 : EventImplementor<DerivedTestEvent, TestEventA, TestEventB>
 {
-	DerivedTestEvent() noexcept
-	: TestEvent(4)
+	DerivedTestEvent(int x) noexcept
+	: TestEvent(x)
 	{
 	}
 };
@@ -109,6 +109,6 @@ int main(int nargs, char **args) noexcept
 	TestEvent{7}.call();
 	TestEvent{-1}.call();
 	TestEvent{14}.call();
-	DerivedTestEvent{}.call();
+	DerivedTestEvent{4}.call();
 	CloneableTestEvent::Clone(CloneableTestEvent{9})->call();
 }
