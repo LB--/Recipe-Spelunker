@@ -1,6 +1,8 @@
 #ifndef resplunk_util_SpecificTo_HeaderPlusPlus
 #define resplunk_util_SpecificTo_HeaderPlusPlus
 
+#include <functional>
+
 namespace resplunk
 {
 	namespace util
@@ -27,12 +29,17 @@ namespace resplunk
 
 		protected:
 			SpecificTo(Specific_t &s)
-			: spec(s)
+			: spec{s}
 			{
 			}
 
+			virtual void specific(Specific_t &s) final
+			{
+				spec = s;
+			}
+
 		private:
-			Specific_t &spec;
+			std::reference_wrapper<Specific_t> spec;
 		};
 		template<typename T>
 		inline SpecificTo<T>::~SpecificTo<T>() = default;
