@@ -18,7 +18,7 @@ namespace resplunk
 			TemplateImplRepo(TemplateImplRepo &&) = delete;
 
 			template<typename T, typename R, std::uintmax_t I = std::uintmax_t{}>
-			static R &get()
+			static R &get() noexcept
 			{
 				static R r = getImpl<T, R, I>();
 				return r;
@@ -27,13 +27,13 @@ namespace resplunk
 		private:
 			struct ImplBase
 			{
-				virtual ~ImplBase() = 0;
+				virtual ~ImplBase() noexcept = 0;
 			};
 			using Impls_t = std::map<std::type_index, std::unique_ptr<ImplBase>>;
 			static Impls_t impls;
 
 			template<typename T, typename R, std::uintmax_t I>
-			static R &getImpl()
+			static R &getImpl() noexcept
 			{
 				struct Impl final : ImplBase
 				{
@@ -50,7 +50,7 @@ namespace resplunk
 				return impl->r;
 			}
 		};
-		inline TemplateImplRepo::ImplBase::~ImplBase() = default;
+		inline TemplateImplRepo::ImplBase::~ImplBase() noexcept = default;
 	};
 };
 

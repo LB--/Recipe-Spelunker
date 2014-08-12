@@ -4,12 +4,12 @@ namespace resplunk
 {
 	namespace server
 	{
-		Server::Server()
+		Server::Server() noexcept
 		{
 			//
 			ConstructEvent{*this}.call();
 		}
-		Server::~Server()
+		Server::~Server() noexcept
 		{
 			DestructEvent{*this}.call();
 			//

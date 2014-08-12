@@ -14,12 +14,12 @@ namespace resplunk
 		{
 			using ConstructEvent = event::ConstructEvent<Server>;
 			using DestructEvent = event::DestructEvent<Server>;
-			Server();
+			Server() noexcept;
 			Server(Server const &) = delete;
 			Server &operator=(Server const &) = delete;
 			Server(Server &&) = delete;
 			Server &operator=(Server &&) = delete;
-			virtual ~Server();
+			virtual ~Server() noexcept = 0;
 
 			//
 		};

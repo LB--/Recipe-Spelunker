@@ -1,14 +1,17 @@
 #include "resplunk/event/CancellableEvent.hpp"
+#include "resplunk/event/CloneableEvent.hpp"
 
 #include <iostream>
 
-using CancellableEvent = resplunk::event::CancellableEvent;
 template<typename... Args>
 using EventImplementor = resplunk::event::EventImplementor<Args...>;
+using CancellableEvent = resplunk::event::CancellableEvent;
 template<typename... Args>
 using EventProcessor = resplunk::event::EventProcessor<Args...>;
 template<typename... Args>
 using EventReactor = resplunk::event::EventReactor<Args...>;
+template<template<typename, typename...> typename Arg = std::unique_ptr, typename... Args>
+using CloneableEvent = resplunk::event::CloneableEvent<Arg, Args...>;
 template<typename... Args>
 using LambdaEventProcessor = resplunk::event::LambdaEventProcessor<Args...>;
 using Event = resplunk::event::Event;
@@ -18,7 +21,7 @@ struct TestEvent
 : EventImplementor<TestEvent, CancellableEvent>
 {
 	int x;
-	TestEvent(int x)
+	TestEvent(int x) noexcept
 	: x(x)
 	{
 	}
@@ -28,11 +31,11 @@ struct TestListener
 : EventProcessor<TestEvent>
 , EventReactor<TestEvent>
 {
-	TestListener()
+	TestListener() noexcept
 	{
 	}
 
-	virtual void onEvent(TestEvent &e) const override
+	virtual void onEvent(TestEvent &e) const noexcept override
 	{
 		std::cout << "P x = " << e.x << std::endl;
 		if(e.x > 10)
@@ -44,7 +47,7 @@ struct TestListener
 			e.cancelled(true);
 		}
 	}
-	virtual void onEvent(TestEvent const &e) override
+	virtual void onEvent(TestEvent const &e) noexcept override
 	{
 		std::cout << "R x = " << e.x << std::endl;
 	}
@@ -53,7 +56,7 @@ struct TestListener
 struct TestEventA
 : EventImplementor<TestEventA, TestEvent>
 {
-	TestEventA()
+	TestEventA() noexcept
 	: TestEvent(1)
 	{
 	}
@@ -61,7 +64,7 @@ struct TestEventA
 struct TestEventB
 : EventImplementor<TestEventB, TestEvent>
 {
-	TestEventB()
+	TestEventB() noexcept
 	: TestEvent(2)
 	{
 	}
@@ -70,19 +73,35 @@ struct TestEventB
 struct DerivedTestEvent
 : EventImplementor<DerivedTestEvent, TestEventA, TestEventB>
 {
-	DerivedTestEvent()
+	DerivedTestEvent() noexcept
 	: TestEvent(4)
 	{
 	}
 };
 
-int main(int nargs, char **args)
+struct CloneableTestEvent
+: EventImplementor<CloneableTestEvent, TestEvent, CloneableEvent<>>
+{
+	CloneableTestEvent(int x) noexcept
+	: TestEvent(x)
+	{
+	}
+
+private:
+	virtual CloneableTestEvent *clone() const noexcept override
+	{
+		return new CloneableTestEvent(x);
+	}
+};
+
+int main(int nargs, char **args) noexcept
 {
 	LambdaEventProcessor<Event> le
 	{
 		[](Event &e)
 		{
-			std::cout << std::endl << "E @ " << &e << std::endl;
+			std::cout << std::endl << "E @ " << &e
+			<< " is \"" << typeid(e).name() << '"' << std::endl;
 		},
 		ListenerPriority::FIRST
 	};
@@ -91,4 +110,5 @@ int main(int nargs, char **args)
 	TestEvent{-1}.call();
 	TestEvent{14}.call();
 	DerivedTestEvent{}.call();
+	CloneableTestEvent::Clone(CloneableTestEvent{9})->call();
 }
