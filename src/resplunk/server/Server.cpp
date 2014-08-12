@@ -7,10 +7,11 @@ namespace resplunk
 		Server::Server()
 		{
 			//
+			ConstructEvent{*this}.call();
 		}
 		Server::~Server()
 		{
-			DestructEvent(*this).call();
+			DestructEvent{*this}.call();
 			//
 		}
 	}
