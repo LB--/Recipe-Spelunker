@@ -40,12 +40,33 @@ struct TestListener
 	}
 };
 
+struct TestEventA
+: resplunk::event::EventImplementor<TestEventA, TestEvent>
+{
+	TestEventA(resplunk::server::Server &s)
+	: resplunk::server::ServerSpecific(s)
+	, TestEvent(s, 1)
+	{
+	}
+};
+struct TestEventB
+: resplunk::event::EventImplementor<TestEventB, TestEvent>
+{
+	TestEventB(resplunk::server::Server &s)
+	: resplunk::server::ServerSpecific(s)
+	, TestEvent(s, 2)
+	{
+	}
+};
+
 struct DerivedTestEvent
-: resplunk::event::EventImplementor<DerivedTestEvent, TestEvent>
+: resplunk::event::EventImplementor<DerivedTestEvent, TestEventA, TestEventB>
 {
 	DerivedTestEvent(resplunk::server::Server &s)
 	: resplunk::server::ServerSpecific(s)
 	, TestEvent(s, 4)
+	, TestEventA(s)
+	, TestEventB(s)
 	{
 	}
 };
