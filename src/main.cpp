@@ -31,7 +31,8 @@ struct TestListener
 : EventProcessor<TestEvent>
 , EventReactor<TestEvent>
 {
-	virtual void onEvent(TestEvent &e) const noexcept override
+private:
+	virtual void process(TestEvent &e) const noexcept override
 	{
 		std::cout << "P x = " << e.x << std::endl;
 		if(e.x > 10)
@@ -43,7 +44,7 @@ struct TestListener
 			e.cancelled(true);
 		}
 	}
-	virtual void onEvent(TestEvent const &e) noexcept override
+	virtual void react(TestEvent const &e) noexcept override
 	{
 		std::cout << "R x = " << e.x << std::endl;
 	}
