@@ -1,8 +1,8 @@
 #ifndef resplunk_server_Server_HeaderPlusPlus
 #define resplunk_server_Server_HeaderPlusPlus
 
-#include "resplunk/event/ConstructEvent.hpp"
-#include "resplunk/event/DestructEvent.hpp"
+#include "resplunk/event/Construct.hpp"
+#include "resplunk/event/Destruct.hpp"
 #include "resplunk/util/SpecificToEvent.hpp"
 
 #include <set>
@@ -15,8 +15,8 @@ namespace resplunk
 
 		struct Server
 		{
-			using ConstructEvent = event::ConstructEvent<Server>;
-			using DestructEvent = event::DestructEvent<Server>;
+			using Construct = event::Construct<Server>;
+			using Destruct = event::Destruct<Server>;
 			using Specific = util::SpecificTo<Server>;
 			using SpecificEvent = util::SpecificToEvent<Server>;
 			Server() noexcept;

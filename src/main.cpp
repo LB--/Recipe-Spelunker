@@ -1,24 +1,24 @@
-#include "resplunk/event/CancellableEvent.hpp"
-#include "resplunk/event/CloneableEvent.hpp"
+#include "resplunk/event/Cancellable.hpp"
+#include "resplunk/event/Cloneable.hpp"
 
 #include <iostream>
 
 template<typename... Args>
-using EventImplementor = resplunk::event::EventImplementor<Args...>;
-using CancellableEvent = resplunk::event::CancellableEvent;
+using EventImplementor = resplunk::event::Implementor<Args...>;
+using Cancellable = resplunk::event::Cancellable;
 template<typename... Args>
-using EventProcessor = resplunk::event::EventProcessor<Args...>;
+using EventProcessor = resplunk::event::Processor<Args...>;
 template<typename... Args>
-using EventReactor = resplunk::event::EventReactor<Args...>;
+using EventReactor = resplunk::event::Reactor<Args...>;
 template<template<typename, typename...> typename Arg = std::unique_ptr, typename... Args>
-using CloneableEvent = resplunk::event::CloneableEvent<Arg, Args...>;
+using Cloneable = resplunk::event::Cloneable<Arg, Args...>;
 template<typename... Args>
-using LambdaEventProcessor = resplunk::event::LambdaEventProcessor<Args...>;
+using LambdaEventProcessor = resplunk::event::LambdaProcessor<Args...>;
 using Event = resplunk::event::Event;
 using ListenerPriority = resplunk::event::ListenerPriority;
 
 struct TestEvent
-: EventImplementor<TestEvent, CancellableEvent>
+: EventImplementor<TestEvent, Cancellable>
 {
 	int x;
 	TestEvent(int x) noexcept
@@ -76,7 +76,7 @@ struct DerivedTestEvent
 };
 
 struct CloneableTestEvent
-: EventImplementor<CloneableTestEvent, TestEvent, CloneableEvent<>>
+: EventImplementor<CloneableTestEvent, TestEvent, Cloneable<>>
 {
 	CloneableTestEvent(int x) noexcept
 	: TestEvent(x)

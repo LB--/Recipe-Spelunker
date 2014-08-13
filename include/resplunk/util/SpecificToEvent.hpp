@@ -10,7 +10,7 @@ namespace resplunk
 	{
 		template<typename T>
 		struct SpecificToEvent
-		: event::EventImplementor<SpecificToEvent<T>, event::Event>
+		: event::Implementor<SpecificToEvent<T>, event::Event>
 		, virtual SpecificTo<T>
 		{
 			using Specific_t = T;
