@@ -13,7 +13,7 @@ namespace resplunk
 		: event::Implementor<SpecificToEvent<T>, event::Event>
 		, virtual SpecificTo<T>
 		{
-			using Specific_t = T;
+			using SpecificTo_t = SpecificTo<T>;
 			virtual ~SpecificToEvent() = 0;
 		};
 		template<typename T>
