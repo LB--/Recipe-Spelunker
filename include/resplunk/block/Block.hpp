@@ -16,7 +16,7 @@ namespace resplunk
 			virtual ~Block() = 0;
 			//
 		};
-		inline Block::~Block() = default();
+		inline Block::~Block() = default;
 	}
 }
 

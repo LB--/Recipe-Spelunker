@@ -18,22 +18,22 @@ namespace resplunk
 			SpecificTo &operator=(SpecificTo &&) = delete;
 			virtual ~SpecificTo() = 0;
 
-			virtual Specific_t &specific() final
+			virtual Specific_t &specific() noexcept final
 			{
 				return spec;
 			}
-			virtual Specific_t const &specific() const final
+			virtual Specific_t const &specific() const noexcept final
 			{
 				return spec;
 			}
 
 		protected:
-			SpecificTo(Specific_t &s)
+			SpecificTo(Specific_t &s) noexcept
 			: spec{s}
 			{
 			}
 
-			virtual void specific(Specific_t &s) final
+			virtual void specific(Specific_t &s) noexcept final
 			{
 				spec = s;
 			}

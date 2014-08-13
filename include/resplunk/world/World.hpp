@@ -25,17 +25,17 @@ namespace resplunk
 				}
 				virtual ~Inhabitant() = 0;
 
-				virtual World &world() final
+				virtual World &world() noexcept final
 				{
 					return w;
 				}
-				virtual World const &world() const final
+				virtual World const &world() const noexcept final
 				{
 					return w;
 				}
 
 			protected:
-				virtual void setWorld(World &wld) final
+				virtual void setWorld(World &wld) noexcept final
 				{
 					//
 					w = wld;

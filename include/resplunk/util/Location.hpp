@@ -12,13 +12,13 @@ namespace resplunk
 		{
 			T x = T{}, y = T{}, z = T{};
 			Location() = default;
-			Location(T x, T y, T z)
+			Location(T x, T y, T z) noexcept
 			: x{x}
 			, y{y}
 			, z{z}
 			{
 			}
-			Location(std::initializer_list<T> const &from)
+			Location(std::initializer_list<T> const &from) noexcept
 			: x{from.size() >= 1? *(from.begin()+0) : T{}}
 			, y{from.size() >= 2? *(from.begin()+1) : T{}}
 			, z{from.size() >= 3? *(from.begin()+2) : T{}}
@@ -30,7 +30,7 @@ namespace resplunk
 			Location &operator=(Location &&) = default;
 			~Location() = default;
 
-			Location add(T xoff, T yoff, T zoff) const
+			Location add(T xoff, T yoff, T zoff) const noexcept
 			{
 				return {x + xoff, y + yoff, z + zoff};
 			}
