@@ -1,7 +1,9 @@
 #include "resplunk/event/Cancellable.hpp"
 #include "resplunk/event/Cloneable.hpp"
+#include "resplunk/util/Tuples.hpp"
 
 #include <iostream>
+#include <string>
 
 template<typename... Args>
 using EventImplementor = resplunk::event::Implementor<Args...>;
@@ -91,9 +93,16 @@ private:
 	}
 };
 
+template<typename T>
+auto lep(std::string const &msg)
+-> LambdaEventProcessor<T>
+{
+	return {[=](T &e){ std::cout << msg << std::endl; }};
+}
+
 int main(int nargs, char **args) noexcept
 {
-	LambdaEventProcessor<Event> lep
+	LambdaEventProcessor<Event> lepe
 	{
 		[](Event &e)
 		{
@@ -106,6 +115,8 @@ int main(int nargs, char **args) noexcept
 	TestEvent{7}.call();
 	TestEvent{-1}.call();
 	TestEvent{14}.call();
+	auto a = lep<TestEventA>("A");
+	auto b = lep<TestEventB>("B");
 	DerivedTestEvent{4}.call();
 	CloneableTestEvent::Clone(CloneableTestEvent{9})->call();
 }
