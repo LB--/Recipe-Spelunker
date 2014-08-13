@@ -7,11 +7,11 @@ namespace resplunk
 		Client::Client() noexcept
 		{
 			//
-			Construct{*this}.call();
+			ConstructEvent{*this}.call();
 		}
 		Client::~Client() noexcept
 		{
-			Destruct{*this}.call();
+			DestructEvent{*this}.call();
 			//
 		}
 	}

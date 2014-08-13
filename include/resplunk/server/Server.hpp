@@ -15,8 +15,8 @@ namespace resplunk
 
 		struct Server
 		{
-			using Construct = event::Construct<Server>;
-			using Destruct = event::Destruct<Server>;
+			using ConstructEvent = event::Construct<Server>;
+			using DestructEvent = event::Destruct<Server>;
 			using Specific = util::SpecificTo<Server>;
 			using SpecificEvent = util::SpecificToEvent<Server>;
 			Server() noexcept;

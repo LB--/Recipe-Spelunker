@@ -10,8 +10,8 @@ namespace resplunk
 		struct Client
 		: virtual Server::Specific
 		{
-			using Construct = event::Construct<Client>;
-			using Destruct = event::Destruct<Client>;
+			using ConstructEvent = event::Construct<Client>;
+			using DestructEvent = event::Destruct<Client>;
 			using Specific = util::SpecificTo<Client>;
 			using SpecificEvent = util::SpecificToEvent<Client>;
 			Client() noexcept;
