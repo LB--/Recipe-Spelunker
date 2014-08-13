@@ -52,31 +52,17 @@ private:
 	}
 };
 
-struct TestEventA
-: EventImplementor<TestEventA, TestEvent>
-{
-	TestEventA() noexcept
-	: TestEvent(1)
-	{
-	}
-};
-struct TestEventB
-: EventImplementor<TestEventB, TestEvent>
-{
-	TestEventB() noexcept
-	: TestEvent(2)
-	{
-	}
-};
+struct TestEvent0 : EventImplementor<TestEvent0, Event> {};
 
-struct DerivedTestEvent
-: EventImplementor<DerivedTestEvent, TestEventA, TestEventB>
-{
-	DerivedTestEvent(int x) noexcept
-	: TestEvent(x)
-	{
-	}
-};
+struct TestEvent1 : EventImplementor<TestEvent1, TestEvent0> {};
+struct TestEvent2 : EventImplementor<TestEvent2, TestEvent0> {};
+struct TestEvent3 : EventImplementor<TestEvent3, TestEvent0> {};
+struct TestEvent4 : EventImplementor<TestEvent4, TestEvent0> {};
+
+struct TestEvent5 : EventImplementor<TestEvent5, TestEvent1, TestEvent2> {};
+struct TestEvent6 : EventImplementor<TestEvent6, TestEvent3, TestEvent4> {};
+
+struct TestEvent7 : EventImplementor<TestEvent7, TestEvent5, TestEvent6> {};
 
 struct CloneableTestEvent
 : EventImplementor<CloneableTestEvent, TestEvent, Cloneable<>>
@@ -111,12 +97,24 @@ int main(int nargs, char **args) noexcept
 		},
 		ListenerPriority::FIRST
 	};
-	TestListener l;
-	TestEvent{7}.call();
-	TestEvent{-1}.call();
-	TestEvent{14}.call();
-	auto a = lep<TestEventA>("A");
-	auto b = lep<TestEventB>("B");
-	DerivedTestEvent{4}.call();
-	CloneableTestEvent::Clone(CloneableTestEvent{9})->call();
+	{
+		TestListener l;
+		TestEvent{7}.call();
+		TestEvent{-1}.call();
+		TestEvent{14}.call();
+	}
+	{
+		auto l0 = lep<TestEvent0>("0");
+		auto l1 = lep<TestEvent1>("1");
+		auto l2 = lep<TestEvent2>("2");
+		auto l3 = lep<TestEvent3>("3");
+		auto l4 = lep<TestEvent4>("4");
+		auto l5 = lep<TestEvent5>("5");
+		auto l6 = lep<TestEvent6>("6");
+		auto l7 = lep<TestEvent7>("7");
+		TestEvent7{}.call();
+	}
+	{
+		CloneableTestEvent::Clone(CloneableTestEvent{9})->call();
+	}
 }
