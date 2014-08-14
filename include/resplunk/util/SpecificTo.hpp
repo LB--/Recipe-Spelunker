@@ -69,7 +69,7 @@ namespace resplunk
 			{
 			}
 
-			virtual void specific(Specific_t &s) const noexcept final
+			virtual void specific(Specific_t &s) noexcept final
 			{
 				spec = s;
 			}
