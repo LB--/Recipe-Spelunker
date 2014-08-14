@@ -11,9 +11,9 @@ namespace resplunk
 		template<typename T>
 		struct SpecificToEvent
 		: event::Implementor<SpecificToEvent<T>, event::Event>
-		, virtual SpecificTo<T>
+		, virtual SpecificTo<T, true>
 		{
-			using SpecificTo_t = SpecificTo<T>;
+			using SpecificTo_t = SpecificTo<T, true>;
 			virtual ~SpecificToEvent() = 0;
 		};
 		template<typename T>

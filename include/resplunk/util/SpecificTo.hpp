@@ -7,10 +7,11 @@ namespace resplunk
 {
 	namespace util
 	{
-		template<typename T>
+		template<typename T, bool LogicalConst = false>
 		struct SpecificTo
 		{
 			using Specific_t = T;
+			static constexpr bool LogicalConst_v = LogicalConst;
 			SpecificTo() = delete;
 			SpecificTo(SpecificTo const &) = default;
 			SpecificTo &operator=(SpecificTo const &) = delete;
@@ -42,7 +43,44 @@ namespace resplunk
 			std::reference_wrapper<Specific_t> spec;
 		};
 		template<typename T>
-		inline SpecificTo<T>::~SpecificTo<T>() = default;
+		struct SpecificTo<T, true>
+		{
+			using Specific_t = T;
+			static constexpr bool LogicalConst_v = true;
+			SpecificTo() = delete;
+			SpecificTo(SpecificTo const &) = default;
+			SpecificTo &operator=(SpecificTo const &) = delete;
+			SpecificTo(SpecificTo &&) = default;
+			SpecificTo &operator=(SpecificTo &&) = delete;
+			virtual ~SpecificTo() = 0;
+
+			virtual Specific_t &specific() const noexcept final
+			{
+				return spec;
+			}
+			virtual Specific_t const &specific() noexcept final
+			{
+				return spec;
+			}
+
+		protected:
+			SpecificTo(Specific_t &s) noexcept
+			: spec{s}
+			{
+			}
+
+			virtual void specific(Specific_t &s) const noexcept final
+			{
+				spec = s;
+			}
+
+		private:
+			mutable std::reference_wrapper<Specific_t> spec;
+		};
+		template<typename T, bool LC>
+		SpecificTo<T, LC>::~SpecificTo<T, LC>() = default;
+		template<typename T>
+		SpecificTo<T, true>::~SpecificTo<T, true>() = default;
 	}
 }
 
