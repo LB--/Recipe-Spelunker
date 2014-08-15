@@ -28,6 +28,8 @@ struct TestEvent
 	{
 	}
 };
+template<>
+TestEvent::Registrar_t TestEvent::Implementor_t::registrar {};
 
 struct TestListener
 : EventProcessor<TestEvent>
@@ -52,17 +54,17 @@ private:
 	}
 };
 
-struct TestEvent0 : EventImplementor<TestEvent0, Event> {};
+struct TestEvent0 : EventImplementor<TestEvent0, Event> {}; template<> TestEvent0::Registrar_t TestEvent0::Implementor_t::registrar {};
 
-struct TestEvent1 : EventImplementor<TestEvent1, TestEvent0> {};
-struct TestEvent2 : EventImplementor<TestEvent2, TestEvent0> {};
-struct TestEvent3 : EventImplementor<TestEvent3, TestEvent0> {};
-struct TestEvent4 : EventImplementor<TestEvent4, TestEvent0> {};
+struct TestEvent1 : EventImplementor<TestEvent1, TestEvent0> {}; template<> TestEvent1::Registrar_t TestEvent1::Implementor_t::registrar {};
+struct TestEvent2 : EventImplementor<TestEvent2, TestEvent0> {}; template<> TestEvent2::Registrar_t TestEvent2::Implementor_t::registrar {};
+struct TestEvent3 : EventImplementor<TestEvent3, TestEvent0> {}; template<> TestEvent3::Registrar_t TestEvent3::Implementor_t::registrar {};
+struct TestEvent4 : EventImplementor<TestEvent4, TestEvent0> {}; template<> TestEvent4::Registrar_t TestEvent4::Implementor_t::registrar {};
 
-struct TestEvent5 : EventImplementor<TestEvent5, TestEvent1, TestEvent2> {};
-struct TestEvent6 : EventImplementor<TestEvent6, TestEvent3, TestEvent4> {};
+struct TestEvent5 : EventImplementor<TestEvent5, TestEvent1, TestEvent2> {}; template<> TestEvent5::Registrar_t TestEvent5::Implementor_t::registrar {};
+struct TestEvent6 : EventImplementor<TestEvent6, TestEvent3, TestEvent4> {}; template<> TestEvent6::Registrar_t TestEvent6::Implementor_t::registrar {};
 
-struct TestEvent7 : EventImplementor<TestEvent7, TestEvent5, TestEvent6> {};
+struct TestEvent7 : EventImplementor<TestEvent7, TestEvent5, TestEvent6> {}; template<> TestEvent7::Registrar_t TestEvent7::Implementor_t::registrar {};
 
 struct CloneableTestEvent
 : EventImplementor<CloneableTestEvent, TestEvent, Cloneable<>>
@@ -78,6 +80,8 @@ private:
 		return new CloneableTestEvent(x);
 	}
 };
+template<>
+CloneableTestEvent::Registrar_t CloneableTestEvent::Implementor_t::registrar {};
 
 template<typename T>
 auto lep(std::string const &msg)
