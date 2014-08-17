@@ -1,10 +1,10 @@
 #ifndef resplunk_world_World_HeaderPlusPlus
 #define resplunk_world_World_HeaderPlusPlus
 
+#include "resplunk/event/Construct.hpp"
+#include "resplunk/event/Destruct.hpp"
 #include "resplunk/util/Cloneable.hpp"
 #include "resplunk/util/Location.hpp"
-
-#include <functional>
 
 namespace resplunk
 {
@@ -12,44 +12,72 @@ namespace resplunk
 	{
 		struct World
 		{
-			//...
+			using ConstructEvent = event::Construct<World>;
+			using DestructEvent = event::Destruct<World>;
+			World() noexcept;
+			World(World const &) = delete;
+			World &operator=(World const &) = delete;
+			World(World &&) = delete;
+			World &operator=(World &&) = delete;
+			virtual ~World() noexcept = 0;
+
+			struct Event
+			: event::Implementor<Event, event::Event>
+			{
+				Event() = default;
+				virtual ~Event() = default;
+
+				virtual World const &instance() noexcept = 0;
+				virtual World &instance() const noexcept = 0;
+			};
 
 			struct Inhabitant
-			: CloneImplementor<Inhabitant>
+			: util::CloneImplementor<Inhabitant>
 			{
-				using Location = util::Location<long double>;
-				Inhabitant(World &w, Location const &loc)
-				: w(w)
-				//
-				{
-				}
-				virtual ~Inhabitant() = 0;
+				using ConstructEvent = event::Construct<Inhabitant>;
+				using DestructEvent = event::Destruct<Inhabitant>;
+				using Location_t = util::Location<long double>;
+				Inhabitant() = delete;
+				Inhabitant(World &w, Location_t const &loc) noexcept;
+				Inhabitant &operator=(Inhabitant const &) = delete;
+				Inhabitant(Inhabitant &&) = delete;
+				Inhabitant &operator=(Inhabitant &&) = delete;
+				virtual ~Inhabitant() noexcept = 0;
 
-				virtual World &world() noexcept final
+				World &world() noexcept;
+				World const &world() const noexcept;
+
+				struct Event
+				: event::Implementor<Event, event::Event>
 				{
-					return w;
-				}
-				virtual World const &world() const noexcept final
-				{
-					return w;
-				}
+					Event() = default;
+					virtual ~Event() = default;
+
+					Inhabitant const &instance() noexcept
+					{
+						return get_instance();
+					}
+					Inhabitant &instance() const noexcept
+					{
+						return get_instance();
+					}
+
+				private:
+					virtual Inhabitant &get_instance() const noexcept = 0;
+				};
 
 			protected:
-				virtual void setWorld(World &wld) noexcept final
-				{
-					//
-					w = wld;
-				}
+				Inhabitant(Inhabitant const &) noexcept;
 
 			private:
-				std::reference_wrapper<World> w;
+				struct Impl;
+				std::unique_ptr<Impl> impl;
 			};
 
 		private:
-			//
+			struct Impl;
+			std::unique_ptr<Impl> impl;
 		};
-		inline World::Inhabitant::~Inhabitant() = default;
-		using Inhabitant = World::Inhabitant;
 	}
 }
 

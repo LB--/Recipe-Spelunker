@@ -2,6 +2,8 @@
 #define resplunk_util_Location_HeaderPlusPlus
 
 #include <initializer_list>
+#include <type_traits>
+#include <tuple>
 
 namespace resplunk
 {
@@ -29,6 +31,15 @@ namespace resplunk
 			Location(Location &&) = default;
 			Location &operator=(Location &&) = default;
 			~Location() = default;
+
+			friend bool operator==(Location const &a, Location const &b) noexcept
+			{
+				return std::tie(a.x, a.y, a.z) == std::tie(b.x, b.y, b.z);
+			}
+			friend bool operator<(Location const &a, Location const &b) noexcept
+			{
+				return std::tie(a.x, a.y, a.z) < std::tie(b.x, b.y, b.z);
+			}
 
 			Location add(T xoff, T yoff, T zoff) const noexcept
 			{

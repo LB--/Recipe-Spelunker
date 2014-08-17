@@ -8,13 +8,11 @@ namespace resplunk
 	namespace server
 	{
 		struct Client
-		: virtual Server::Specific
 		{
 			using ConstructEvent = event::Construct<Client>;
 			using DestructEvent = event::Destruct<Client>;
-			using Specific = util::SpecificTo<Client>;
-			using SpecificEvent = util::SpecificToEvent<Client>;
-			Client() noexcept;
+			Client() = delete;
+			Client(Server &) noexcept;
 			Client(Client const &) = delete;
 			Client &operator=(Client const &) = delete;
 			Client(Client &&) = delete;
@@ -30,7 +28,22 @@ namespace resplunk
 				return !(a == b);
 			}
 
-			//
+			Server &server() noexcept;
+			Server const &server() const noexcept;
+
+			struct Event
+			: event::Implementor<Event, event::Event>
+			{
+				Event() = default;
+				virtual ~Event() = default;
+
+				virtual Client const &instance() noexcept = 0;
+				virtual Client &instance() const noexcept = 0;
+			};
+
+		private:
+			struct Impl;
+			std::unique_ptr<Impl> impl;
 		};
 	}
 }

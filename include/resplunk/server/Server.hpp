@@ -3,9 +3,9 @@
 
 #include "resplunk/event/Construct.hpp"
 #include "resplunk/event/Destruct.hpp"
-#include "resplunk/util/SpecificToEvent.hpp"
 
 #include <set>
+#include <memory>
 
 namespace resplunk
 {
@@ -17,8 +17,6 @@ namespace resplunk
 		{
 			using ConstructEvent = event::Construct<Server>;
 			using DestructEvent = event::Destruct<Server>;
-			using Specific = util::SpecificTo<Server>;
-			using SpecificEvent = util::SpecificToEvent<Server>;
 			Server() noexcept;
 			Server(Server const &) = delete;
 			Server &operator=(Server const &) = delete;
@@ -35,7 +33,19 @@ namespace resplunk
 				return !(a == b);
 			}
 
-			//
+			struct Event
+			: event::Implementor<Event, event::Event>
+			{
+				Event() = default;
+				virtual ~Event() = default;
+
+				virtual Server const &instance() noexcept = 0;
+				virtual Server &instance() const noexcept = 0;
+			};
+
+		private:
+			struct Impl;
+			std::unique_ptr<Impl> impl;
 		};
 	}
 }
