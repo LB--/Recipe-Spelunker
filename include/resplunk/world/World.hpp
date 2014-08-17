@@ -1,8 +1,7 @@
 #ifndef resplunk_world_World_HeaderPlusPlus
 #define resplunk_world_World_HeaderPlusPlus
 
-#include "resplunk/event/Construct.hpp"
-#include "resplunk/event/Destruct.hpp"
+#include "resplunk/event/RAII.hpp"
 #include "resplunk/util/Cloneable.hpp"
 #include "resplunk/util/Location.hpp"
 

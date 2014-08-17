@@ -1,8 +1,7 @@
 #ifndef resplunk_server_Server_HeaderPlusPlus
 #define resplunk_server_Server_HeaderPlusPlus
 
-#include "resplunk/event/Construct.hpp"
-#include "resplunk/event/Destruct.hpp"
+#include "resplunk/event/RAII.hpp"
 
 #include <set>
 #include <memory>
