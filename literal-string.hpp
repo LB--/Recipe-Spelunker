@@ -11,16 +11,37 @@ namespace resplunk
 		template<typename CharT = char>
 		struct LiteralString final
 		{
-			static_assert(std::is_literal_type<LiteralString>::value, "LiteralString is not literal!");
 			using Char_t = CharT;
+			static constexpr Char_t EMPTY[] {{}};
+			constexpr LiteralString() noexcept
+			: LiteralString(EMPTY)
+			{
+			}
 			template<std::size_t N>
 			constexpr LiteralString(Char_t const (&str)[N]) noexcept
 			: p(str)
 			, s(N-1)
 			{
 			}
-			constexpr ~LiteralString() noexcept
+			constexpr LiteralString(LiteralString const &from) noexcept
+			: p(from.p)
+			, s(from.s)
 			{
+			}
+			constexpr LiteralString &operator=(LiteralString const &from) noexcept
+			{
+				p = from.p;
+				s = from.s;
+			}
+			constexpr LiteralString(LiteralString &&from) noexcept
+			: p(std::move(from.p))
+			, s(std::move(from.s))
+			{
+			}
+			constexpr LiteralString &operator=(LiteralString &&from) noexcept
+			{
+				p = std::move(from.p);
+				s = std::move(from.s);
 			}
 
 			constexpr std::size_t size() const noexcept
@@ -48,6 +69,26 @@ namespace resplunk
 				return p+s;
 			}
 
+			friend constexpr bool operator==(LiteralString const &a, LiteralString const &b) noexcept
+			{
+				if(a.size() == b.size())
+				{
+					for(std::size_t i = 0; i < a.size(); ++i)
+					{
+						if(a[i] != b[i])
+						{
+							return false;
+						}
+					}
+					return true;
+				}
+				return false;
+			}
+			friend constexpr bool operator!=(LiteralString const &a, LiteralString const &b) noexcept
+			{
+				return !(a == b);
+			}
+
 			operator std::basic_string<Char_t>() const noexcept
 			{
 				return {p, s};
@@ -55,7 +96,7 @@ namespace resplunk
 
 		private:
 			Char_t const *p;
-			std::size_t const s;
+			std::size_t s;
 		};
 	}
 }
