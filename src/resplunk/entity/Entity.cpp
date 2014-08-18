@@ -1,5 +1,7 @@
 #include "resplunk/entity/Entity.hpp"
 
+#include <functional>
+
 namespace resplunk
 {
 	namespace event
@@ -16,7 +18,9 @@ namespace resplunk
 	{
 		struct Entity::Impl final
 		{
-			Impl() noexcept
+			Impl(world::World &w, Location_t const &loc) noexcept
+			: w{w}
+			, loc{loc}
 			{
 			}
 			Impl(Impl const &from) = default;
@@ -24,23 +28,46 @@ namespace resplunk
 			{
 			}
 
-			//
+			auto world() noexcept
+			-> world::World &
+			{
+				return w;
+			}
+			auto world() const noexcept
+			-> world::World const &
+			{
+				return w;
+			}
+
+		private:
+			std::reference_wrapper<world::World> w;
+			Location_t loc;
 		};
 
-		Entity::Entity() noexcept
-		: impl{new Impl}
+		Entity::Entity(world::World &w, Location_t const &loc) noexcept
+		: impl{new Impl{w, loc}}
 		{
 			ConstructEvent{*this}.call();
 		}
 		Entity::Entity(Entity const &from) noexcept
-		: world::Inhabitant{from}
-		, impl{new Impl{*from.impl}}
+		: impl{new Impl{*from.impl}}
 		{
 			ConstructEvent{*this}.call();
 		}
 		Entity::~Entity() noexcept
 		{
 			DestructEvent{*this}.call();
+		}
+
+		auto Entity::world() noexcept
+		-> world::World &
+		{
+			return impl->world();
+		}
+		auto Entity::world() const noexcept
+		-> world::World const &
+		{
+			return impl->world();
 		}
 	}
 }

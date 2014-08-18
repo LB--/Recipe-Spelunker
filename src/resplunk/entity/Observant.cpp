@@ -33,7 +33,7 @@ namespace resplunk
 			ConstructEvent{*this}.call();
 		}
 		Observant::Observant(Observant const &from) noexcept
-		: world::Inhabitant{from}
+		: Entity{from}
 		, impl{new Impl{*from.impl}}
 		{
 			ConstructEvent{*this}.call();

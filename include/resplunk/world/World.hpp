@@ -30,49 +30,6 @@ namespace resplunk
 				virtual World &instance() const noexcept = 0;
 			};
 
-			struct Inhabitant
-			: util::CloneImplementor<Inhabitant>
-			{
-				using ConstructEvent = event::Construct<Inhabitant>;
-				using DestructEvent = event::Destruct<Inhabitant>;
-				using Location_t = util::Location<long double>;
-				Inhabitant() = delete;
-				Inhabitant(World &w, Location_t const &loc) noexcept;
-				Inhabitant &operator=(Inhabitant const &) = delete;
-				Inhabitant(Inhabitant &&) = delete;
-				Inhabitant &operator=(Inhabitant &&) = delete;
-				virtual ~Inhabitant() noexcept = 0;
-
-				World &world() noexcept;
-				World const &world() const noexcept;
-
-				struct Event
-				: event::Implementor<Event, event::Event>
-				{
-					Event() = default;
-					virtual ~Event() = default;
-
-					Inhabitant const &instance() noexcept
-					{
-						return get_instance();
-					}
-					Inhabitant &instance() const noexcept
-					{
-						return get_instance();
-					}
-
-				private:
-					virtual Inhabitant &get_instance() const noexcept = 0;
-				};
-
-			protected:
-				Inhabitant(Inhabitant const &) noexcept;
-
-			private:
-				struct Impl;
-				std::unique_ptr<Impl> impl;
-			};
-
 		private:
 			struct Impl;
 			std::unique_ptr<Impl> impl;

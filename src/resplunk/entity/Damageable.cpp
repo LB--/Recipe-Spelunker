@@ -33,7 +33,7 @@ namespace resplunk
 			ConstructEvent{*this}.call();
 		}
 		Damageable::Damageable(Damageable const &from) noexcept
-		: world::Inhabitant{from}
+		: Entity{from}
 		, impl{new Impl{*from.impl}}
 		{
 			ConstructEvent{*this}.call();
