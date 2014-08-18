@@ -1,5 +1,6 @@
 #include "resplunk/event/Cancellable.hpp"
 #include "resplunk/event/Cloneable.hpp"
+#include "resplunk/util/LiteralString.hpp"
 
 #include <iostream>
 #include <string>
@@ -17,6 +18,7 @@ template<typename... Args>
 using LambdaEventProcessor = resplunk::event::LambdaProcessor<Args...>;
 using Event = resplunk::event::Event;
 using ListenerPriority = resplunk::event::ListenerPriority;
+using LiteralString = resplunk::util::LiteralString<>;
 
 struct TestEvent
 : EventImplementor<TestEvent, Cancellable>
@@ -86,14 +88,23 @@ template<typename T>
 auto lep(std::string const &msg)
 -> LambdaEventProcessor<T>
 {
-	return {[=](T &e){ std::cout << msg << std::endl; }};
+	return {[=](T &e){ std::cout << msg << " "; }};
+}
+
+constexpr LiteralString lsf()
+{
+	return "LiteralString";
 }
 
 int main(int nargs, char **args) noexcept
 {
+	{
+		std::cout << std::string(lsf()) << std::endl;
+		std::cout << std::boolalpha << (lsf() == lsf()) << std::endl;
+	}
 	LambdaEventProcessor<Event> lepe
 	{
-		[](Event &e)
+		[](Event &e) noexcept
 		{
 			std::cout << std::endl << "E @ " << &e
 			<< " is \"" << typeid(e).name() << '"' << std::endl;
@@ -116,6 +127,7 @@ int main(int nargs, char **args) noexcept
 		auto l6 = lep<TestEvent6>("6");
 		auto l7 = lep<TestEvent7>("7");
 		TestEvent7{}.call();
+		std::cout << std::endl;
 	}
 	{
 		CloneableTestEvent::Clone(CloneableTestEvent{9})->call();
