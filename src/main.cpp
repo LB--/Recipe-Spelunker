@@ -1,5 +1,6 @@
 #include "resplunk/event/Cancellable.hpp"
 #include "resplunk/event/Cloneable.hpp"
+#include "resplunk/event/Exclusive.hpp"
 #include "resplunk/util/LiteralString.hpp"
 
 #include <iostream>
