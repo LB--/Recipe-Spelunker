@@ -13,8 +13,7 @@ template<typename... Args>
 using EventProcessor = resplunk::event::Processor<Args...>;
 template<typename... Args>
 using EventReactor = resplunk::event::Reactor<Args...>;
-template<template<typename, typename...> typename Arg = std::unique_ptr, typename... Args>
-using Cloneable = resplunk::event::Cloneable<Arg, Args...>;
+using Cloneable = resplunk::event::Cloneable;
 template<typename... Args>
 using LambdaEventProcessor = resplunk::event::LambdaProcessor<Args...>;
 using Event = resplunk::event::Event;
@@ -69,7 +68,7 @@ struct TestEvent6 : EventImplementor<TestEvent6, TestEvent3, TestEvent4> {}; tem
 struct TestEvent7 : EventImplementor<TestEvent7, TestEvent5, TestEvent6> {}; template<> TestEvent7::Registrar_t TestEvent7::Implementor_t::registrar {};
 
 struct CloneableTestEvent
-: EventImplementor<CloneableTestEvent, TestEvent, Cloneable<>>
+: EventImplementor<CloneableTestEvent, TestEvent, Cloneable>
 {
 	CloneableTestEvent(int x) noexcept
 	: TestEvent(x)
