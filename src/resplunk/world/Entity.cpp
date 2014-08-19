@@ -1,4 +1,4 @@
-#include "resplunk/entity/Entity.hpp"
+#include "resplunk/world/Entity.hpp"
 
 #include <functional>
 
@@ -6,7 +6,7 @@ namespace resplunk
 {
 	namespace event
 	{
-		using namespace entity;
+		using namespace world;
 		template<>
 		Entity::ConstructEvent::Registrar_t Entity::ConstructEvent::Implementor_t::registrar {};
 		template<>
@@ -14,11 +14,11 @@ namespace resplunk
 		template<>
 		Entity::Event::Registrar_t Entity::Event::Implementor_t::registrar {};
 	}
-	namespace entity
+	namespace world
 	{
 		struct Entity::Impl final
 		{
-			Impl(world::World &w, Location_t const &loc) noexcept
+			Impl(World &w, Location_t const &loc) noexcept
 			: w{w}
 			, loc{loc}
 			{
@@ -29,22 +29,22 @@ namespace resplunk
 			}
 
 			auto world() noexcept
-			-> world::World &
+			-> World &
 			{
 				return w;
 			}
 			auto world() const noexcept
-			-> world::World const &
+			-> World const &
 			{
 				return w;
 			}
 
 		private:
-			std::reference_wrapper<world::World> w;
+			std::reference_wrapper<World> w;
 			Location_t loc;
 		};
 
-		Entity::Entity(world::World &w, Location_t const &loc) noexcept
+		Entity::Entity(World &w, Location_t const &loc) noexcept
 		: impl{new Impl{w, loc}}
 		{
 			ConstructEvent{*this}.call();
@@ -60,14 +60,20 @@ namespace resplunk
 		}
 
 		auto Entity::world() noexcept
-		-> world::World &
+		-> World &
 		{
 			return impl->world();
 		}
 		auto Entity::world() const noexcept
-		-> world::World const &
+		-> World const &
 		{
 			return impl->world();
+		}
+
+		auto Entity::clone() const noexcept
+		-> Entity *
+		{
+			return new Entity{*this};
 		}
 	}
 }

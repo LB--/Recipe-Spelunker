@@ -1,51 +1,55 @@
-#ifndef resplunk_entity_Entity_HeaderPlusPlus
-#define resplunk_entity_Entity_HeaderPlusPlus
+#ifndef resplunk_world_Entity_HeaderPlusPlus
+#define resplunk_world_Entity_HeaderPlusPlus
 
 #include "resplunk/world/World.hpp"
 
 namespace resplunk
 {
-	namespace entity
+	namespace world
 	{
-		using Location_t = util::Location<long double>;
-		struct Entity
+		struct Entity final
 		: util::CloneImplementor<Entity>
 		{
+			using Location_t = util::Location<long double>;
 			using ConstructEvent = event::Construct<Entity>;
 			using DestructEvent = event::Destruct<Entity>;
 			Entity() = delete;
-			Entity(world::World &, Location_t const &) noexcept;
+			Entity(World &, Location_t const &) noexcept;
 			Entity &operator=(Entity const &) = delete;
 			Entity(Entity &&) = delete;
 			Entity &operator=(Entity &&) = delete;
 			virtual ~Entity() noexcept;
 
-			world::World &world() noexcept;
-			world::World const &world() const noexcept;
+			World &world() noexcept;
+			World const &world() const noexcept;
 
 			struct Event
 			: event::Implementor<Event, event::Event>
 			{
-				Event() = default;
+				Event(Entity &inst)
+				: inst(inst)
+				{
+				}
 				virtual ~Event() = default;
 
 				Entity const &instance() noexcept
 				{
-					return get_instance();
+					return inst;
 				}
 				Entity &instance() const noexcept
 				{
-					return get_instance();
+					return inst;
 				}
 
 			private:
-				virtual Entity &get_instance() const noexcept = 0;
+				Entity &inst;
 			};
 
-		protected:
+		private:
 			Entity(Entity const &from) noexcept;
 
-		private:
+			virtual Entity *clone() const noexcept override;
+
 			struct Impl;
 			std::unique_ptr<Impl> impl;
 		};
