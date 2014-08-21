@@ -137,6 +137,7 @@ int main(int nargs, char **args) noexcept
 		struct TestMeta final
 		: CloneImplementor<TestMeta>
 		{
+			int x = 0;
 			TestMeta(Metadatable &m) noexcept
 			{
 			}
@@ -145,15 +146,23 @@ int main(int nargs, char **args) noexcept
 			TestMeta(TestMeta const &) = default;
 			virtual TestMeta *clone() const noexcept override
 			{
-				std::cout << "TestMeta being cloned" << std::endl;
 				return new TestMeta{*this};
 			}
 		};
 		auto &meta = m.meta<TestMeta>();
 		if(!meta)
 		{
-			meta.emplace<TestMeta>(m);
+			TestMeta &tm = meta.emplace<TestMeta>(m);
+			tm.x = 7;
 		}
-		Metadatable::Clone(m);
+		{
+			TestMeta &tm = meta;
+			std::cout << "x = " << tm.x << std::endl;
+		}
+		{
+			auto mc = Metadatable::Clone(m);
+			TestMeta &tm = mc->meta<TestMeta>();
+			std::cout << "x = " << tm.x << std::endl;
+		}
 	} std::cout << std::endl;
 }
