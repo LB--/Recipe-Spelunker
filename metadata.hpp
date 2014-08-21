@@ -16,11 +16,11 @@ namespace resplunk
 		{
 			static_assert(std::is_base_of<util::Cloneable, T>::value, "T must be Cloneable");
 			Metadata() = default;
-			Metadata(Metadata const &m)
+			Metadata(Metadata const &m) noexcept
 			: t{m.t? std::move(T::Clone(*m.t)) : nullptr}
 			{
 			}
-			Metadata &operator=(Metadata const &m)
+			Metadata &operator=(Metadata const &m) noexcept
 			{
 				if(m.t)
 				{
@@ -40,11 +40,14 @@ namespace resplunk
 				return static_cast<bool>(t);
 			}
 			template<typename V, typename... Args>
-			void emplace(Args &&... args) noexcept
+			auto emplace(Args &&... args) noexcept
+			-> V &
 			{
 				static_assert(std::is_same<T, V>::value || (std::is_base_of<T, V>::value && std::has_virtual_destructor<T>::value), "Invalid inheritance");
 				static_assert(std::is_nothrow_constructible<V, Args...>::value, "Constructor not noexcept");
-				return t.reset(new V{std::forward<Args>(args)...});
+				V *vp = new V{std::forward<Args>(args)...};
+				t.reset(vp);
+				return *vp;
 			}
 			operator T &() noexcept
 			{
@@ -53,6 +56,11 @@ namespace resplunk
 			operator T const &() const noexcept
 			{
 				return *t;
+			}
+			auto steal() noexcept
+			-> std::unique_ptr<T>
+			{
+				return std::move(t);
 			}
 
 		private:
@@ -124,10 +132,7 @@ namespace resplunk
 				Meta() = default;
 
 			private:
-				Meta(Meta const &from)
-				: m{from.m}
-				{
-				}
+				Meta(Meta const &) = default;
 				virtual Meta *clone() const noexcept
 				{
 					return new Meta{*this};
