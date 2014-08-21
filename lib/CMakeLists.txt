@@ -1,3 +1,3 @@
 
-list(APPEND RESPLUNK_IMPL_DEPENDS
+resplunk_api_depends(
 )
