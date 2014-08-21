@@ -2,18 +2,12 @@
 
 #include <functional>
 
+RESPLUNK_EVENT(resplunk::world::Entity::ConstructEvent);
+RESPLUNK_EVENT(resplunk::world::Entity::DestructEvent);
+RESPLUNK_EVENT(resplunk::world::Entity::Event);
+
 namespace resplunk
 {
-	namespace event
-	{
-		using namespace world;
-		template<>
-		Entity::ConstructEvent::Registrar_t Entity::ConstructEvent::Implementor_t::registrar {};
-		template<>
-		Entity::DestructEvent::Registrar_t Entity::DestructEvent::Implementor_t::registrar {};
-		template<>
-		Entity::Event::Registrar_t Entity::Event::Implementor_t::registrar {};
-	}
 	namespace world
 	{
 		struct Entity::Impl final

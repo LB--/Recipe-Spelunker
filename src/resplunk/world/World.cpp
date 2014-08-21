@@ -1,17 +1,11 @@
 #include "resplunk/world/World.hpp"
 
+RESPLUNK_EVENT(resplunk::world::World::ConstructEvent);
+RESPLUNK_EVENT(resplunk::world::World::DestructEvent);
+RESPLUNK_EVENT(resplunk::world::World::Event);
+
 namespace resplunk
 {
-	namespace event
-	{
-		using namespace world;
-		template<>
-		World::ConstructEvent::Registrar_t World::ConstructEvent::Implementor_t::registrar {};
-		template<>
-		World::DestructEvent::Registrar_t World::DestructEvent::Implementor_t::registrar {};
-		template<>
-		World::Event::Registrar_t World::Event::Implementor_t::registrar {};
-	}
 	namespace world
 	{
 		struct World::Impl final

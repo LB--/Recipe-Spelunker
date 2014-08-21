@@ -1,17 +1,11 @@
 #include "resplunk/server/Server.hpp"
 
+RESPLUNK_EVENT(resplunk::server::Server::ConstructEvent);
+RESPLUNK_EVENT(resplunk::server::Server::DestructEvent);
+RESPLUNK_EVENT(resplunk::server::Server::Event);
+
 namespace resplunk
 {
-	namespace event
-	{
-		using namespace server;
-		template<>
-		Server::ConstructEvent::Registrar_t Server::ConstructEvent::Implementor_t::registrar {};
-		template<>
-		Server::DestructEvent::Registrar_t Server::DestructEvent::Implementor_t::registrar {};
-		template<>
-		Server::Event::Registrar_t Server::Event::Implementor_t::registrar {};
-	}
 	namespace server
 	{
 		struct Server::Impl final

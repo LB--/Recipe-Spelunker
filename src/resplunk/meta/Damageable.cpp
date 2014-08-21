@@ -1,13 +1,9 @@
 #include "resplunk/meta/Damageable.hpp"
 
+RESPLUNK_EVENT(resplunk::meta::Damageable::Event);
+
 namespace resplunk
 {
-	namespace event
-	{
-		using namespace meta;
-		template<>
-		Damageable::Event::Registrar_t Damageable::Event::Implementor_t::registrar {};
-	}
 	namespace meta
 	{
 		struct Damageable::Impl final

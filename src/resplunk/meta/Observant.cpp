@@ -1,13 +1,9 @@
 #include "resplunk/meta/Observant.hpp"
 
+RESPLUNK_EVENT(resplunk::meta::Observant::Event);
+
 namespace resplunk
 {
-	namespace event
-	{
-		using namespace meta;
-		template<>
-		Observant::Event::Registrar_t Observant::Event::Implementor_t::registrar {};
-	}
 	namespace meta
 	{
 		struct Observant::Impl final
