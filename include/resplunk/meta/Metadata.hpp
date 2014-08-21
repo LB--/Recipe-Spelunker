@@ -16,22 +16,34 @@ namespace resplunk
 		{
 			static_assert(std::is_base_of<util::Cloneable, T>::value, "T must be Cloneable");
 			Metadata() = default;
-			Metadata &operator=(Metadata const &m)
+			Metadata(Metadata const &m)
 			: t{m.t? std::move(T::Clone(*m.t)) : nullptr}
 			{
+			}
+			Metadata &operator=(Metadata const &m)
+			{
+				if(m.t)
+				{
+					t = std::move(T::Clone(*m.t));
+				}
+				else
+				{
+					t = nullptr;
+				}
+				return *this;
 			}
 			Metadata(Metadata &&) = delete;
 			Metadata &operator=(Metadata &&) = delete;
 
 			operator bool() const noexcept
 			{
-				return t;
+				return static_cast<bool>(t);
 			}
 			template<typename V, typename... Args>
 			void emplace(Args &&... args) noexcept
 			{
 				static_assert(std::is_same<T, V>::value || (std::is_base_of<T, V>::value && std::has_virtual_destructor<T>::value), "Invalid inheritance");
-				static_assert(noexcept(V{std::forward<Args>(args)...}), "Constructor not noexcept");
+				static_assert(std::is_nothrow_constructible<V, Args...>::value, "Constructor not noexcept");
 				return t.reset(new V{std::forward<Args>(args)...});
 			}
 			operator T &() noexcept
@@ -55,12 +67,11 @@ namespace resplunk
 			template<typename T>
 			Metadata<T> &meta() noexcept
 			{
-				auto it = data.find(typeid(T));
-				if(it == data.end())
+				if(data.find(typeid(T)) == data.end())
 				{
-					data.emplace(typeid(T), Data_t::mapped_type{new Meta<T>{*this}});
+					data.emplace(typeid(T), Data_t::mapped_type{new Meta<T>});
 				}
-				return it->second->get<T>();
+				return data.at(typeid(T))->get<T>();
 			}
 			template<typename T>
 			Metadata<T> meta() const noexcept
@@ -83,13 +94,26 @@ namespace resplunk
 			}
 
 		private:
+			virtual Metadatable *clone() const noexcept override
+			{
+				return new Metadatable{*this};
+			}
+
 			struct MetaBase
 			: util::CloneImplementor<MetaBase>
 			{
 				template<typename T>
-				virtual Metadata<T> &get() noexcept = 0;
+				auto get() noexcept
+				-> Metadata<T> &
+				{
+					return dynamic_cast<Meta<T> &>(*this).m;
+				}
 				template<typename T>
-				virtual Metadata<T> const &get() const noexcept = 0;
+				auto get() const noexcept
+				-> Metadata<T> const &
+				{
+					return dynamic_cast<Meta<T> const &>(*this).m;
+				}
 			};
 			template<typename T>
 			struct Meta final
@@ -97,26 +121,20 @@ namespace resplunk
 			, util::CloneImplementor<Meta<T>>
 			{
 				Metadata<T> m;
-
-				template<>
-				virtual Metadata<T> &get<T>() noexcept override
-				{
-					return m;
-				}
-				template<>
-				virtual Metadata<T> const &get<T>() const noexcept override
-				{
-					return m;
-				}
+				Meta() = default;
 
 			private:
+				Meta(Meta const &from)
+				: m{from.m}
+				{
+				}
 				virtual Meta *clone() const noexcept
 				{
 					return new Meta{*this};
 				}
 			};
 
-			using Data_t = std::unordered_map<std::type_index, std::unique_ptr<MetaBase>>;
+			using Data_t = std::/*unordered_*/map<std::type_index, std::unique_ptr<MetaBase>>;
 			Data_t data;
 		};
 	}

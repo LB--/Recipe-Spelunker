@@ -1,7 +1,7 @@
 #include "resplunk/event/Cancellable.hpp"
 #include "resplunk/event/Cloneable.hpp"
-#include "resplunk/event/Exclusive.hpp"
 #include "resplunk/util/LiteralString.hpp"
+#include "resplunk/meta/Metadata.hpp"
 
 #include <iostream>
 #include <string>
@@ -19,6 +19,9 @@ using LambdaEventProcessor = resplunk::event::LambdaProcessor<Args...>;
 using Event = resplunk::event::Event;
 using ListenerPriority = resplunk::event::ListenerPriority;
 using LiteralString = resplunk::util::LiteralString<>;
+using Metadatable = resplunk::meta::Metadatable;
+template<typename T>
+using CloneImplementor = resplunk::util::CloneImplementor<T>;
 
 struct TestEvent
 : EventImplementor<TestEvent, Cancellable>
@@ -99,7 +102,7 @@ int main(int nargs, char **args) noexcept
 	{
 		std::cout << std::string(lsf()) << std::endl;
 		std::cout << std::boolalpha << (lsf() == lsf()) << std::endl;
-	}
+	} std::cout << std::endl;
 	LambdaEventProcessor<Event> lepe
 	{
 		[](Event &e) noexcept
@@ -114,7 +117,7 @@ int main(int nargs, char **args) noexcept
 		TestEvent{7}.call();
 		TestEvent{-1}.call();
 		TestEvent{14}.call();
-	}
+	} std::cout << std::endl;
 	{
 		auto l0 = lep<TestEvent0>("0");
 		auto l1 = lep<TestEvent1>("1");
@@ -125,9 +128,32 @@ int main(int nargs, char **args) noexcept
 		auto l6 = lep<TestEvent6>("6");
 		auto l7 = lep<TestEvent7>("7");
 		TestEvent7{}.call();
-		std::cout << std::endl;
-	}
+	} std::cout << std::endl;
 	{
 		CloneableTestEvent::Clone(CloneableTestEvent{9})->call();
-	}
+	} std::cout << std::endl;
+	{
+		Metadatable m;
+		struct TestMeta final
+		: CloneImplementor<TestMeta>
+		{
+			TestMeta(Metadatable &m) noexcept
+			{
+			}
+
+		private:
+			TestMeta(TestMeta const &) = default;
+			virtual TestMeta *clone() const noexcept override
+			{
+				std::cout << "TestMeta being cloned" << std::endl;
+				return new TestMeta{*this};
+			}
+		};
+		auto &meta = m.meta<TestMeta>();
+		if(!meta)
+		{
+			meta.emplace<TestMeta>(m);
+		}
+		Metadatable::Clone(m);
+	} std::cout << std::endl;
 }

@@ -2,13 +2,15 @@
 #define resplunk_world_Entity_HeaderPlusPlus
 
 #include "resplunk/world/World.hpp"
+#include "resplunk/util/Cloneable.hpp"
 
 namespace resplunk
 {
 	namespace world
 	{
 		struct Entity final
-		: util::CloneImplementor<Entity>
+		: meta::Metadatable
+		, util::CloneImplementor<Entity>
 		{
 			using Location_t = util::Location<long double>;
 			using ConstructEvent = event::Construct<Entity>;

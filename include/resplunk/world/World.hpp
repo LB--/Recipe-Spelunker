@@ -1,8 +1,8 @@
 #ifndef resplunk_world_World_HeaderPlusPlus
 #define resplunk_world_World_HeaderPlusPlus
 
+#include "resplunk/meta/Metadata.hpp"
 #include "resplunk/event/RAII.hpp"
-#include "resplunk/util/Cloneable.hpp"
 #include "resplunk/util/Location.hpp"
 
 namespace resplunk
@@ -10,6 +10,7 @@ namespace resplunk
 	namespace world
 	{
 		struct World
+		: virtual meta::Metadatable
 		{
 			using ConstructEvent = event::Construct<World>;
 			using DestructEvent = event::Destruct<World>;
