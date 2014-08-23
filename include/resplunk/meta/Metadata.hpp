@@ -32,8 +32,8 @@ namespace resplunk
 				}
 				return *this;
 			}
-			Metadata(Metadata &&) = delete;
-			Metadata &operator=(Metadata &&) = delete;
+			Metadata(Metadata &&) = default;
+			Metadata &operator=(Metadata &&) = default;
 
 			operator bool() const noexcept
 			{
