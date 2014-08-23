@@ -4,6 +4,8 @@
 #include "resplunk/util/Cloneable.hpp"
 
 #include <type_traits>
+#include <utility>
+#include <memory>
 #include <typeindex>
 #include <map>
 
@@ -20,27 +22,20 @@ namespace resplunk
 			: t{m.t? std::move(T::Clone(*m.t)) : nullptr}
 			{
 			}
-			Metadata &operator=(Metadata const &m) noexcept
+			Metadata &operator=(Metadata m) & noexcept
 			{
-				if(m.t)
-				{
-					t = std::move(T::Clone(*m.t));
-				}
-				else
-				{
-					t = nullptr;
-				}
+				swap(m);
 				return *this;
 			}
 			Metadata(Metadata &&) = default;
-			Metadata &operator=(Metadata &&) = default;
+			Metadata &operator=(Metadata &&) & = default;
 
 			operator bool() const noexcept
 			{
 				return static_cast<bool>(t);
 			}
-			template<typename V, typename... Args>
-			auto emplace(Args &&... args) noexcept
+			template<typename V = T, typename... Args>
+			auto emplace(Args &&... args) & noexcept
 			-> V &
 			{
 				static_assert(std::is_same<T, V>::value || (std::is_base_of<T, V>::value && std::has_virtual_destructor<T>::value), "Invalid inheritance");
@@ -49,7 +44,7 @@ namespace resplunk
 				t.reset(vp);
 				return *vp;
 			}
-			operator T &() noexcept
+			operator T &() & noexcept
 			{
 				return *t;
 			}
@@ -57,10 +52,24 @@ namespace resplunk
 			{
 				return *t;
 			}
-			auto steal() noexcept
+			auto steal() & noexcept
 			-> std::unique_ptr<T>
 			{
 				return std::move(t);
+			}
+
+			void swap(Metadata &other) & noexcept
+			{
+				return t.swap(other.t);
+			}
+			friend void swap(Metadata &a, Metadata &b) noexcept
+			{
+				return a.swap(b);
+			}
+
+			friend bool operator==(Metadata const &a, Metadata const &b) noexcept
+			{
+				return std::addressof(a) == std::addressof(b);
 			}
 
 		private:
@@ -68,9 +77,23 @@ namespace resplunk
 		};
 
 		struct Metadatable
-		: util::CloneImplementor<Metadatable>
 		{
 			Metadatable() = default;
+			Metadatable(Metadatable const &m) noexcept
+			{
+				for(meta : m.data)
+				{
+					data.emplace(meta.first, std::move(MetaBase::Clone(*meta.second)));
+				}
+			}
+			Metadatable &operator=(Metadatable m) noexcept
+			{
+				swap(m);
+				return *this;
+			}
+			Metadatable(Metadatable &&) = default;
+			Metadatable &operator=(Metadatable &&) = default;
+			virtual ~Metadatable() = default;
 
 			template<typename T>
 			Metadata<T> &meta() noexcept
@@ -92,21 +115,16 @@ namespace resplunk
 				return it->second->get<T>();
 			}
 
-		protected:
-			Metadatable(Metadatable const &m)
+			void swap(Metadatable &other) noexcept
 			{
-				for(meta : m.data)
-				{
-					data.emplace(meta.first, std::move(MetaBase::Clone(*meta.second)));
-				}
+				return data.swap(other.data);
+			}
+			friend void swap(Metadatable &a, Metadatable &b) noexcept
+			{
+				return a.swap(b);
 			}
 
 		private:
-			virtual Metadatable *clone() const noexcept override
-			{
-				return new Metadatable{*this};
-			}
-
 			struct MetaBase
 			: util::CloneImplementor<MetaBase>
 			{

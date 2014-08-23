@@ -37,8 +37,8 @@ int main()
 		assert(tm.x == 7);
 	}
 	{
-		auto mc = Metadatable::Clone(m);
-		TestMeta &tm = mc->meta<TestMeta>();
+		Metadatable mc {m};
+		TestMeta &tm = mc.meta<TestMeta>();
 		assert(tm.x == 7);
 	}
 }
