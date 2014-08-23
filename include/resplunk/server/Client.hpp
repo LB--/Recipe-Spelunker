@@ -23,10 +23,6 @@ namespace resplunk
 			{
 				return std::addressof(a) == std::addressof(b);
 			}
-			friend bool operator!=(Client const &a, Client const &b) noexcept
-			{
-				return !(a == b);
-			}
 
 			Server &server() noexcept;
 			Server const &server() const noexcept;

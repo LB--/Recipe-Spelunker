@@ -12,8 +12,8 @@ namespace resplunk
 	{
 		struct Entity::Impl final
 		{
-			Impl(World &w, Location_t const &loc) noexcept
-			: w{w}
+			Impl(Reality &r, Location_t const &loc) noexcept
+			: r{r}
 			, loc{loc}
 			{
 			}
@@ -22,24 +22,24 @@ namespace resplunk
 			{
 			}
 
-			auto world() noexcept
-			-> World &
+			auto reality() noexcept
+			-> Reality &
 			{
-				return w;
+				return r;
 			}
-			auto world() const noexcept
-			-> World const &
+			auto reality() const noexcept
+			-> Reality const &
 			{
-				return w;
+				return r;
 			}
 
 		private:
-			std::reference_wrapper<World> w;
+			std::reference_wrapper<Reality> r;
 			Location_t loc;
 		};
 
-		Entity::Entity(World &w, Location_t const &loc) noexcept
-		: impl{new Impl{w, loc}}
+		Entity::Entity(Reality &r, Location_t const &loc) noexcept
+		: impl{new Impl{r, loc}}
 		{
 			ConstructEvent{*this}.call();
 		}
@@ -48,26 +48,47 @@ namespace resplunk
 		{
 			ConstructEvent{*this}.call();
 		}
+		auto Entity::operator=(Entity from) noexcept
+		-> Entity &
+		{
+			swap(from);
+			return *this;
+		}
+		Entity::Entity(Entity &&from) noexcept
+		: impl{std::move(from.impl)}
+		{
+		}
+		Entity &Entity::operator=(Entity &&from) noexcept
+		{
+			impl = std::move(from.impl);
+			return *this;
+		}
 		Entity::~Entity() noexcept
 		{
-			DestructEvent{*this}.call();
+			if(impl)
+			{
+				DestructEvent{*this}.call();
+			}
 		}
 
-		auto Entity::world() noexcept
-		-> World &
+		auto Entity::reality() noexcept
+		-> Reality &
 		{
-			return impl->world();
+			return impl->reality();
 		}
-		auto Entity::world() const noexcept
-		-> World const &
+		auto Entity::reality() const noexcept
+		-> Reality const &
 		{
-			return impl->world();
+			return impl->reality();
 		}
 
-		auto Entity::clone() const noexcept
-		-> Entity *
+		void Entity::swap(Entity &other) noexcept
 		{
-			return new Entity{*this};
+			return impl.swap(other.impl);
+		}
+		void swap(Entity &a, Entity &b) noexcept
+		{
+			return a.swap(b);
 		}
 	}
 }

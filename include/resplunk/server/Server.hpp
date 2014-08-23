@@ -27,10 +27,6 @@ namespace resplunk
 			{
 				return std::addressof(a) == std::addressof(b);
 			}
-			friend bool operator!=(Server const &a, Server const &b) noexcept
-			{
-				return !(a == b);
-			}
 
 			struct Event
 			: event::Implementor<Event, event::Event>

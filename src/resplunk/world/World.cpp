@@ -17,6 +17,7 @@ namespace resplunk
 			{
 			}
 
+		private:
 			//
 		};
 
@@ -27,7 +28,10 @@ namespace resplunk
 		}
 		World::~World() noexcept
 		{
-			DestructEvent{*this}.call();
+			if(impl)
+			{
+				DestructEvent{*this}.call();
+			}
 		}
 	}
 }

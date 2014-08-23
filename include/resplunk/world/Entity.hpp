@@ -1,8 +1,9 @@
 #ifndef resplunk_world_Entity_HeaderPlusPlus
 #define resplunk_world_Entity_HeaderPlusPlus
 
-#include "resplunk/world/World.hpp"
-#include "resplunk/util/Cloneable.hpp"
+#include "resplunk/meta/Metadata.hpp"
+#include "resplunk/world/Reality.hpp"
+#include "resplunk/util/Location.hpp"
 
 namespace resplunk
 {
@@ -10,20 +11,20 @@ namespace resplunk
 	{
 		struct Entity final
 		: meta::Metadatable
-		, util::CloneImplementor<Entity>
 		{
 			using Location_t = util::Location<long double>;
 			using ConstructEvent = event::Construct<Entity>;
 			using DestructEvent = event::Destruct<Entity>;
 			Entity() = delete;
-			Entity(World &, Location_t const &) noexcept;
-			Entity &operator=(Entity const &) = delete;
-			Entity(Entity &&) = delete;
-			Entity &operator=(Entity &&) = delete;
-			virtual ~Entity() noexcept;
+			Entity(Reality &, Location_t const &) noexcept;
+			Entity(Entity const &from) noexcept;
+			Entity &operator=(Entity) noexcept;
+			Entity(Entity &&) noexcept;
+			Entity &operator=(Entity &&) noexcept;
+			~Entity() noexcept;
 
-			World &world() noexcept;
-			World const &world() const noexcept;
+			Reality &reality() noexcept;
+			Reality const &reality() const noexcept;
 
 			struct Event
 			: event::Implementor<Event, event::Event>
@@ -47,11 +48,10 @@ namespace resplunk
 				Entity &inst;
 			};
 
+			void swap(Entity &) noexcept;
+			friend void swap(Entity &, Entity &) noexcept;
+
 		private:
-			Entity(Entity const &from) noexcept;
-
-			virtual Entity *clone() const noexcept override;
-
 			struct Impl;
 			std::unique_ptr<Impl> impl;
 		};

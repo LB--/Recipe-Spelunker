@@ -3,7 +3,7 @@
 
 #include "resplunk/meta/Metadata.hpp"
 #include "resplunk/event/RAII.hpp"
-#include "resplunk/util/Location.hpp"
+#include "resplunk/world/Reality.hpp"
 
 namespace resplunk
 {
@@ -19,7 +19,10 @@ namespace resplunk
 			World &operator=(World const &) = delete;
 			World(World &&) = delete;
 			World &operator=(World &&) = delete;
-			virtual ~World() noexcept = 0;
+			virtual ~World() noexcept;
+
+			virtual Reality &reality() noexcept = 0;
+			virtual Reality const &reality() const noexcept = 0;
 
 			struct Event
 			: event::Implementor<Event, event::Event>
