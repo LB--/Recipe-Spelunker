@@ -115,6 +115,12 @@ namespace resplunk
 				return it->second->get<T>();
 			}
 
+			template<typename T>
+			void remove() noexcept
+			{
+				data.erase(typeid(T));
+			}
+
 			void swap(Metadatable &other) noexcept
 			{
 				return data.swap(other.data);
