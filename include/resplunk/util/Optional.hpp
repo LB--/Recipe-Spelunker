@@ -26,7 +26,7 @@ namespace resplunk
 				valid = true;
 			}
 			Optional(Optional const &from) noexcept
-			: Optional(static_cast<T &>(from))
+			: Optional(static_cast<T const &>(from))
 			{
 			}
 			Optional &operator=(Optional from) noexcept
