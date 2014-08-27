@@ -529,6 +529,22 @@ namespace resplunk
 
 			//
 
+			bool homologous() const noexcept
+			{
+				if(list.size() > 0)
+				{
+					auto t = typeid(list.at(0));
+					for(v : list)
+					{
+						if(t != typeid(v))
+						{
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+
 		protected:
 			ListValue(ListValue const &) = default;
 
