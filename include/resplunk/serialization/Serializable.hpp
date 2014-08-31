@@ -8,7 +8,8 @@ namespace resplunk
 {
 	namespace serialization
 	{
-		struct Target;
+		struct Serializer;
+
 		struct Serializable
 		{
 			virtual ~Serializable() = default;
@@ -19,7 +20,7 @@ namespace resplunk
 			virtual util::Optional<ObjectValue> serialize() const noexcept = 0;
 
 		private:
-			//
+			friend Serializer;
 		};
 	}
 }

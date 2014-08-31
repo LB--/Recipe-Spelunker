@@ -1,7 +1,7 @@
 #ifndef resplunk_world_Voxel_HeaderPlusPlus
 #define resplunk_world_Voxel_HeaderPlusPlus
 
-#include "resplunk/meta/Metadata.hpp"
+#include "resplunk/util/Metadata.hpp"
 #include "resplunk/world/World.hpp"
 #include "resplunk/util/Location.hpp"
 #include "resplunk/util/Optional.hpp"

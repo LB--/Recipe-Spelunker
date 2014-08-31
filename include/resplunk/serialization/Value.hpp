@@ -4,6 +4,7 @@
 #include "resplunk/util/Cloneable.hpp"
 #include "resplunk/util/Optional.hpp"
 #include "resplunk/util/LiteralString.hpp"
+#include "resplunk/serialization/Serializer.hpp"
 
 #include <type_traits>
 #include <cstdint>
@@ -34,7 +35,7 @@ namespace resplunk
 				Hint &operator=(Hint const &) = delete;
 				Hint(Hint &&) = delete;
 				Hint &operator=(Hint &&) = delete;
-				virtual ~Hint() noexcept = 0;
+				virtual ~Hint() noexcept = default;
 
 			protected:
 				Hint(Hint const &) = default;
@@ -64,6 +65,8 @@ namespace resplunk
 			{
 				return std::move(h);
 			}
+
+			virtual void serialize(Serializer &) const noexcept = 0;
 
 			virtual bool null() const noexcept
 			{
@@ -108,7 +111,6 @@ namespace resplunk
 		private:
 			util::ClonePtr<Hint> h {nullptr};
 		};
-		inline Value::Hint::~Hint() noexcept = default;
 
 		struct NullValue final
 		: virtual Value
@@ -122,6 +124,11 @@ namespace resplunk
 			operator Value_t() const noexcept
 			{
 				return nullptr;
+			}
+
+			virtual void serialize(Serializer &s) const noexcept override
+			{
+				return s.serialize(*this);
 			}
 
 			virtual bool null() const noexcept override
@@ -152,6 +159,11 @@ namespace resplunk
 			operator Value_t() const noexcept
 			{
 				return v;
+			}
+
+			virtual void serialize(Serializer &s) const noexcept override
+			{
+				return s.serialize(*this);
 			}
 
 			virtual util::Optional<bool> boolean() const noexcept override
@@ -196,6 +208,11 @@ namespace resplunk
 			operator Value_t() const noexcept
 			{
 				return v;
+			}
+
+			virtual void serialize(Serializer &s) const noexcept override
+			{
+				return s.serialize(*this);
 			}
 
 			virtual util::Optional<bool> boolean() const noexcept override
@@ -263,6 +280,11 @@ namespace resplunk
 				return v;
 			}
 
+			virtual void serialize(Serializer &s) const noexcept override
+			{
+				return s.serialize(*this);
+			}
+
 			virtual util::Optional<bool> boolean() const noexcept override
 			{
 				if(v == 0u)
@@ -328,6 +350,11 @@ namespace resplunk
 				return v;
 			}
 
+			virtual void serialize(Serializer &s) const noexcept override
+			{
+				return s.serialize(*this);
+			}
+
 			virtual util::Optional<std::intmax_t> signed_int() const noexcept override
 			{
 				if(v >= std::numeric_limits<std::intmax_t>::min()
@@ -385,6 +412,11 @@ namespace resplunk
 			operator Value_t const &() const noexcept
 			{
 				return v;
+			}
+
+			virtual void serialize(Serializer &s) const noexcept override
+			{
+				return s.serialize(*this);
 			}
 
 			virtual util::Optional<bool> boolean() const noexcept override
@@ -508,6 +540,11 @@ namespace resplunk
 
 			//type information...
 
+			virtual void serialize(Serializer &s) const noexcept override
+			{
+				return s.serialize(*this);
+			}
+
 		protected:
 			ObjectValue(ObjectValue const &) = default;
 
@@ -545,6 +582,11 @@ namespace resplunk
 				return true;
 			}
 
+			virtual void serialize(Serializer &s) const noexcept override
+			{
+				return s.serialize(*this);
+			}
+
 		protected:
 			ListValue(ListValue const &) = default;
 
@@ -565,6 +607,11 @@ namespace resplunk
 			MapValue() = default;
 
 			//
+
+			virtual void serialize(Serializer &s) const noexcept override
+			{
+				return s.serialize(*this);
+			}
 
 		protected:
 			MapValue(MapValue const &) = default;

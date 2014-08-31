@@ -1,6 +1,6 @@
 #undef NDEBUG
 
-#include "resplunk/meta/Metadata.hpp"
+#include "resplunk/util/Metadata.hpp"
 
 #include <cassert>
 

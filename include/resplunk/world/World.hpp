@@ -1,7 +1,7 @@
 #ifndef resplunk_world_World_HeaderPlusPlus
 #define resplunk_world_World_HeaderPlusPlus
 
-#include "resplunk/meta/Metadata.hpp"
+#include "resplunk/util/Metadata.hpp"
 #include "resplunk/event/RAII.hpp"
 #include "resplunk/world/Reality.hpp"
 

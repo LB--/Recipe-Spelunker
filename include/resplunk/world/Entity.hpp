@@ -1,7 +1,7 @@
 #ifndef resplunk_world_Entity_HeaderPlusPlus
 #define resplunk_world_Entity_HeaderPlusPlus
 
-#include "resplunk/meta/Metadata.hpp"
+#include "resplunk/util/Metadata.hpp"
 #include "resplunk/world/Reality.hpp"
 #include "resplunk/util/Location.hpp"
 
