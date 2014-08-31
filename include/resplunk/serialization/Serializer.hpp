@@ -17,8 +17,15 @@ namespace resplunk
 		struct ListValue;
 		struct MapValue;
 
+		struct Translator;
+
 		struct Serializer
 		{
+			Serializer() noexcept = default;
+			Serializer(Serializer const &) = delete;
+			Serializer &operator=(Serializer const &) = delete;
+			Serializer(Serializer &&) = delete;
+			Serializer &operator=(Serializer &&) = delete;
 			virtual ~Serializer() noexcept = default;
 
 			virtual void serialize(Serializable const &) const noexcept final;

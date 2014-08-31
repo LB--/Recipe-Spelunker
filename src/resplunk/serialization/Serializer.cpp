@@ -1,6 +1,5 @@
 #include "resplunk/serialization/Serializer.hpp"
 #include "resplunk/serialization/Serializable.hpp"
-#include "resplunk/serialization/Value.hpp"
 
 namespace resplunk
 {
