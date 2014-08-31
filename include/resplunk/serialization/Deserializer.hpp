@@ -37,6 +37,14 @@ namespace resplunk
 			virtual void deserialize(util::Optional<       ListValue> &) const noexcept = 0;
 			virtual void deserialize(util::Optional<        MapValue> &) const noexcept = 0;
 		};
+		template<typename ValueT, typename DeserializerT>
+		auto Deserialize(DeserializerT &d) noexcept
+		-> util::Optional<ValueT>
+		{
+			util::Optional<ValueT> v;
+			d.deserialize(v);
+			return v;
+		}
 	}
 }
 
