@@ -4,24 +4,26 @@
 #include "resplunk/util/Metadata.hpp"
 #include "resplunk/world/Reality.hpp"
 #include "resplunk/util/Location.hpp"
+#include "resplunk/util/Cloneable.hpp"
 
 namespace resplunk
 {
 	namespace world
 	{
-		struct Entity final
+		struct Entity
 		: meta::Metadatable
+		, util::CloneImplementor<Entity>
 		{
 			using Location_t = util::Location<long double>;
 			using ConstructEvent = event::Construct<Entity>;
 			using DestructEvent = event::Destruct<Entity>;
 			Entity() = delete;
 			Entity(Reality &, Location_t const &) noexcept;
-			Entity(Entity const &from) noexcept;
-			Entity &operator=(Entity) noexcept;
-			Entity(Entity &&) noexcept;
-			Entity &operator=(Entity &&) noexcept;
-			~Entity() noexcept;
+			Entity(Entity const &from) = delete;
+			Entity &operator=(Entity) = delete;
+			Entity(Entity &&) = delete;
+			Entity &operator=(Entity &&) = delete;
+			virtual ~Entity() noexcept;
 
 			Reality &reality() noexcept;
 			Reality const &reality() const noexcept;
@@ -29,11 +31,7 @@ namespace resplunk
 			struct Event
 			: event::Implementor<Event, event::Event>
 			{
-				Event(Entity &inst)
-				: inst(inst)
-				{
-				}
-				virtual ~Event() = default;
+				virtual ~Event() noexcept = 0;
 
 				Entity const &instance() noexcept
 				{
@@ -44,17 +42,23 @@ namespace resplunk
 					return inst;
 				}
 
+			protected:
+				Event(Entity &inst)
+				: inst(inst)
+				{
+				}
+
 			private:
 				Entity &inst;
 			};
 
-			void swap(Entity &) noexcept;
-			friend void swap(Entity &, Entity &) noexcept;
+//			virtual ?...Event? new_...Event(...) = 0;
 
 		private:
 			struct Impl;
 			std::unique_ptr<Impl> impl;
 		};
+		inline Entity::Event::~Event() noexcept = default;
 	}
 }
 

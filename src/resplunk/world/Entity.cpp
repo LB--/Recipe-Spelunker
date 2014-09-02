@@ -43,26 +43,6 @@ namespace resplunk
 		{
 			ConstructEvent{*this}.call();
 		}
-		Entity::Entity(Entity const &from) noexcept
-		: impl{new Impl{*from.impl}}
-		{
-			ConstructEvent{*this}.call();
-		}
-		auto Entity::operator=(Entity from) noexcept
-		-> Entity &
-		{
-			swap(from);
-			return *this;
-		}
-		Entity::Entity(Entity &&from) noexcept
-		: impl{std::move(from.impl)}
-		{
-		}
-		Entity &Entity::operator=(Entity &&from) noexcept
-		{
-			impl = std::move(from.impl);
-			return *this;
-		}
 		Entity::~Entity() noexcept
 		{
 			if(impl)
@@ -82,13 +62,6 @@ namespace resplunk
 			return impl->reality();
 		}
 
-		void Entity::swap(Entity &other) noexcept
-		{
-			return impl.swap(other.impl);
-		}
-		void swap(Entity &a, Entity &b) noexcept
-		{
-			return a.swap(b);
-		}
+		//...
 	}
 }
