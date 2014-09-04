@@ -42,6 +42,9 @@ namespace resplunk
 					return inst;
 				}
 
+				template<typename EntityT>
+				using type_for = typename EntityT::Event;
+
 			protected:
 				Event(Entity &inst)
 				: inst(inst)
@@ -51,14 +54,134 @@ namespace resplunk
 			private:
 				Entity &inst;
 			};
+			struct RealityChangeEvent
+			: event::Implementor<RealityChangeEvent, event::Cancellable, Event>
+			{
+				virtual ~RealityChangeEvent() noexcept = 0;
 
-//			virtual ?...Event? new_...Event(...) = 0;
+				Reality const &to() noexcept
+				{
+					return t;
+				}
+				Reality &to() const noexcept
+				{
+					return t;
+				}
+				void to(Reality const &r) noexcept
+				{
+					//const_cast required for logical-const :(
+					t = const_cast<Reality &>(r);
+				}
+
+				template<typename EntityT>
+				using type_for = typename EntityT::RealityChangeEvent;
+				template<typename EntityT>
+				friend auto make_RealityChangeEvent(EntityT &e) noexcept
+				-> std::unique_ptr<type_for<EntityT>>
+				{
+					using EventBase = Event::type_for<EntityT>;
+					using EventDerived = type_for<EntityT>;
+					static_assert(std::is_base_of<Entity, EntityT>::value);
+					static_assert(std::is_base_of<Event, EventBase>::value);
+					static_assert(std::is_base_of<EventBase, EventDerived>::value);
+					static_assert(std::is_base_of<RealityChangeEvent, EventDerived>::value);
+					if(auto p = dynamic_cast<EventDerived *>(e.Entity::new_RealityChangeEvent()))
+					{
+						return std::unique_ptr<EventDerived>{p};
+					}
+					return std::unique_ptr<EventDerived>{nullptr};
+				}
+
+			protected:
+				RealityChangeEvent(Reality t) noexcept
+				: t{t}
+				{
+				}
+
+			private:
+				std::reference_wrapper<Reality> t;
+			};
+			struct LocationChangeEvent
+			: event::Implementor<LocationChangeEvent, event::Cancellable, Event>
+			{
+				virtual ~LocationChangeEvent() noexcept = 0;
+
+				Location_t to() const noexcept
+				{
+					return t;
+				}
+				void to(Location_t loc) noexcept
+				{
+					t = loc;
+				}
+
+				template<typename EntityT>
+				using type_for = typename EntityT::LocationChangeEvent;
+				template<typename EntityT>
+				friend auto make_LocationChangeEvent(EntityT &e) noexcept
+				-> std::unique_ptr<type_for<EntityT>>
+				{
+					using EventBase = Event::type_for<EntityT>;
+					using EventDerived = type_for<EntityT>;
+					static_assert(std::is_base_of<Entity, EntityT>::value);
+					static_assert(std::is_base_of<Event, EventBase>::value);
+					static_assert(std::is_base_of<EventBase, EventDerived>::value);
+					static_assert(std::is_base_of<LocationChangeEvent, EventDerived>::value);
+					if(auto p = dynamic_cast<EventDerived *>(e.Entity::new_LocationChangeEvent()))
+					{
+						return std::unique_ptr<EventDerived>{p};
+					}
+					return std::unique_ptr<EventDerived>{nullptr};
+				}
+
+			protected:
+				LocationChangeEvent(Location_t t) noexcept
+				: t{t}
+				{
+				}
+
+			private:
+				Location_t t;
+			};
+			struct TeleportEvent
+			: event::Implementor<TeleportEvent, RealityChangeEvent, LocationChangeEvent>
+			{
+				virtual ~TeleportEvent() noexcept = 0;
+
+				template<typename EntityT>
+				using type_for = typename EntityT::TeleportEvent;
+				template<typename EntityT>
+				friend auto make_TeleportEvent(EntityT &e) noexcept
+				-> std::unique_ptr<type_for<EntityT>>
+				{
+					using EventBase = Event::type_for<EntityT>;
+					using EventDerived = type_for<EntityT>;
+					static_assert(std::is_base_of<Entity, EntityT>::value);
+					static_assert(std::is_base_of<Event, EventBase>::value);
+					static_assert(std::is_base_of<EventBase, EventDerived>::value);
+					static_assert(std::is_base_of<EventBase, RealityChangeEvent::type_for<EntityT>>::value);
+					static_assert(std::is_base_of<EventBase, LocationChangeEvent::type_for<EntityT>>::value);
+					static_assert(std::is_base_of<TeleportEvent, EventDerived>::value);
+					if(auto p = dynamic_cast<EventDerived *>(e.Entity::new_TeleportEvent()))
+					{
+						return std::unique_ptr<EventDerived>{p};
+					}
+					return std::unique_ptr<EventDerived>{nullptr};
+				}
+			};
 
 		private:
 			struct Impl;
 			std::unique_ptr<Impl> impl;
+
+			virtual RealityChangeEvent *new_RealityChangeEvent(Reality &to) noexcept = 0;
+			virtual LocationChangeEvent *new_LocationChangeEvent(Location_t to) noexcept = 0;
+			virtual TeleportEvent *new_TeleportEvent(Reality &rt, Location_t lt) noexcept = 0;
 		};
 		inline Entity::Event::~Event() noexcept = default;
+		inline Entity::RealityChangeEvent::~RealityChangeEvent() noexcept = default;
+		inline Entity::LocationChangeEvent::~LocationChangeEvent() noexcept = default;
+		inline Entity::TeleportEvent::~TeleportEvent() noexcept = default;
 	}
 }
 
