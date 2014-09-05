@@ -5,6 +5,7 @@
 #include "resplunk/world/Reality.hpp"
 #include "resplunk/util/Location.hpp"
 #include "resplunk/util/Cloneable.hpp"
+#include "resplunk/event/Cancellable.hpp"
 
 namespace resplunk
 {
@@ -19,7 +20,7 @@ namespace resplunk
 			using DestructEvent = event::Destruct<Entity>;
 			Entity() = delete;
 			Entity(Reality &, Location_t const &) noexcept;
-			Entity &operator=(Entity) = delete;
+			Entity &operator=(Entity const &) = delete;
 			Entity(Entity &&) = delete;
 			Entity &operator=(Entity &&) = delete;
 			virtual ~Entity() noexcept;

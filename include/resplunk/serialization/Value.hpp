@@ -489,13 +489,12 @@ namespace resplunk
 			template<typename SerializableT>
 			auto as() noexcept
 			{
-				static constexpr util::LiteralString const &scope = SerializableT::SCOPE;
 				struct Helper final
 				{
 					ObjectValue &inst;
 					auto operator[](std::string const &n) noexcept
 					{
-						static constexpr std::string const scope_str {scope};
+						static std::string const scope_str {typeid(SerializableT).name()};
 						struct Assignable final
 						{
 							ObjectValue &inst;
@@ -519,14 +518,13 @@ namespace resplunk
 			template<typename SerializableT>
 			auto as() const noexcept
 			{
-				static constexpr util::LiteralString const &scope = SerializableT::SCOPE;
 				struct Helper final
 				{
 					ObjectValue &inst;
 					auto operator[](std::string const &n) noexcept
 					-> util::Optional<Value const &>
 					{
-						static constexpr std::string const scope_str {scope};
+						static std::string const scope_str {typeid(SerializableT).name()};
 						auto it = inst.values.find(scope_str+'\0'+n);
 						if(it != inst.values.end())
 						{
@@ -570,7 +568,7 @@ namespace resplunk
 			{
 				if(list.size() > 0)
 				{
-					auto t = typeid(list.at(0));
+					auto &t = typeid(list.at(0));
 					for(v : list)
 					{
 						if(t != typeid(v))

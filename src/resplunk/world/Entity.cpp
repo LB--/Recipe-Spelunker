@@ -22,7 +22,11 @@ namespace resplunk
 			, loc{loc}
 			{
 			}
-			Impl(Impl const &from) = default;
+			Impl(Impl const &from) noexcept
+			: r{from.r}
+			, loc{from.loc}
+			{
+			}
 			~Impl() noexcept
 			{
 			}
@@ -64,7 +68,7 @@ namespace resplunk
 			ConstructEvent{*this}.call();
 		}
 		Entity::Entity(Entity const &from) noexcept
-		: impl{from.impl}
+		: impl{new Impl{*from.impl}}
 		{
 			ConstructEvent{*this}.call();
 		}

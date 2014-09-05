@@ -10,7 +10,7 @@ namespace resplunk
 	namespace world
 	{
 		struct Reality
-		: meta::Metadatable
+		: virtual util::Metadatable
 		, util::CloneImplementor<Reality>
 		{
 			using ConstructEvent = event::Construct<Reality>;

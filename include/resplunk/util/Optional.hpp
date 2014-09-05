@@ -14,13 +14,12 @@ namespace resplunk
 		template<typename T>
 		struct Optional final
 		{
-			static_assert(!std::is_polymorphic<T>::value, "T cannot be polymorphic");
 			using Value_t = T;
 			Optional(std::nullptr_t = nullptr) noexcept
 			{
 			}
 			template<typename... Args>
-			Optional(Args &&args) noexcept
+			Optional(Args &&... args) noexcept
 			{
 				new (&data) T{std::forward<Args>(args)...};
 				valid = true;
@@ -34,6 +33,7 @@ namespace resplunk
 				from.valid = false;
 				std::swap_ranges(std::begin(data), std::end(data), std::begin(from.data));
 				valid = true;
+				return *this;
 			}
 			Optional(Optional &&from) noexcept
 			{
@@ -46,6 +46,7 @@ namespace resplunk
 				std::swap_ranges(std::begin(data), std::end(data), std::begin(from.data));
 				valid = vb;
 				from.valid = va;
+				return *this;
 			}
 			~Optional() noexcept
 			{

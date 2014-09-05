@@ -10,7 +10,7 @@ namespace resplunk
 	namespace world
 	{
 		struct World
-		: virtual meta::Metadatable
+		: virtual util::Metadatable
 		{
 			using ConstructEvent = event::Construct<World>;
 			using DestructEvent = event::Destruct<World>;

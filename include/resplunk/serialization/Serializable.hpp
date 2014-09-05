@@ -26,15 +26,7 @@ namespace resplunk
 			virtual ~Factory() noexcept = default;
 
 			template<typename SerializableT>
-			struct Default final
-			: virtual Factory
-			{
-				virtual SerializableT *reconstruct(ObjectValue const &v) const noexcept override
-				{
-					static_assert(std::is_nothrow_constructible<SerializableT, ObjectValue const &>::value);
-					return new SerializableT{v};
-				}
-			};
+			struct Default;
 
 			template<typename SerializableT, typename FactoryT = Default<SerializableT>>
 			static auto register_for() noexcept
@@ -69,6 +61,16 @@ namespace resplunk
 
 			virtual Serializable *reconstruct(ObjectValue const &) const noexcept = 0;
 		};
+		template<typename SerializableT>
+		struct Factory::Default final
+		: virtual Factory
+		{
+			virtual SerializableT *reconstruct(ObjectValue const &v) const noexcept override
+			{
+				static_assert(std::is_nothrow_constructible<SerializableT, ObjectValue const &>::value);
+				return new SerializableT{v};
+			}
+		};
 
 		struct Serializable
 		{
@@ -93,7 +95,7 @@ namespace resplunk
 			using Implementor_t = Implementor;
 
 		private:
-			friend SerializeableT;
+			friend SerializableT;
 			Implementor() noexcept = default;
 
 			virtual Factory::Registration_t factory_id() const noexcept override

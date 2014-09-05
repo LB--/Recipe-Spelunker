@@ -4,7 +4,7 @@
 
 #include <cassert>
 
-using Metadatable = resplunk::meta::Metadatable;
+using Metadatable = resplunk::util::Metadatable;
 template<typename... Args>
 using CloneImplementor = resplunk::util::CloneImplementor<Args...>;
 

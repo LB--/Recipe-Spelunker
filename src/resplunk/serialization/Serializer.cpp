@@ -7,7 +7,7 @@ namespace resplunk
 	{
 		void Serializer::serialize(Serializable const &s) const noexcept
 		{
-			if(auto object = s.serialize())
+			if(auto &&object = s.serialize())
 			{
 				serialize(object);
 			}

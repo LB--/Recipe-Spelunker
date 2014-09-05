@@ -13,7 +13,7 @@ namespace resplunk
 	namespace world
 	{
 		struct Voxel final
-		: meta::Metadatable
+		: util::Metadatable
 		{
 			using Location_t = util::Location<std::uintmax_t>;
 			using ConstructEvent = event::Construct<Voxel>;
