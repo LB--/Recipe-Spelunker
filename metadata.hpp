@@ -1,5 +1,5 @@
-#ifndef resplunk_meta_Metadatable_HeaderPlusPlus
-#define resplunk_meta_Metadatable_HeaderPlusPlus
+#ifndef resplunk_util_Metadatable_HeaderPlusPlus
+#define resplunk_util_Metadatable_HeaderPlusPlus
 
 #include "resplunk/util/Cloneable.hpp"
 
@@ -11,7 +11,7 @@
 
 namespace resplunk
 {
-	namespace meta
+	namespace util
 	{
 		template<typename T>
 		struct Metadata final
