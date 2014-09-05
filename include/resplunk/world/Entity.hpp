@@ -11,7 +11,7 @@ namespace resplunk
 	namespace world
 	{
 		struct Entity
-		: meta::Metadatable
+		: virtual util::Metadatable
 		, util::CloneImplementor<Entity>
 		{
 			using Location_t = util::Location<long double>;
@@ -19,7 +19,6 @@ namespace resplunk
 			using DestructEvent = event::Destruct<Entity>;
 			Entity() = delete;
 			Entity(Reality &, Location_t const &) noexcept;
-			Entity(Entity const &from) = delete;
 			Entity &operator=(Entity) = delete;
 			Entity(Entity &&) = delete;
 			Entity &operator=(Entity &&) = delete;
@@ -27,6 +26,8 @@ namespace resplunk
 
 			Reality &reality() noexcept;
 			Reality const &reality() const noexcept;
+
+			Location_t location() const noexcept;
 
 			struct Event
 			: event::Implementor<Event, event::Event>
@@ -151,6 +152,9 @@ namespace resplunk
 					return std::unique_ptr<EventDerived>{nullptr};
 				}
 			};
+
+		protected:
+			Entity(Entity const &) noexcept;
 
 		private:
 			struct Impl;

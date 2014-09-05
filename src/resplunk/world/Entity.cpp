@@ -14,6 +14,8 @@ namespace resplunk
 	namespace world
 	{
 		struct Entity::Impl final
+		: private event::Reactor<RealityChangeEvent>
+		, private event::Reactor<LocationChangeEvent>
 		{
 			Impl(Reality &r, Location_t const &loc) noexcept
 			: r{r}
@@ -36,13 +38,33 @@ namespace resplunk
 				return r;
 			}
 
+			auto location() const noexcept
+			-> Location_t
+			{
+				return loc;
+			}
+
 		private:
 			std::reference_wrapper<Reality> r;
 			Location_t loc;
+
+			virtual void react(RealityChangeEvent const &e) noexcept override
+			{
+				r = e.to();
+			}
+			virtual void react(LocationChangeEvent const &e) noexcept override
+			{
+				loc = e.to();
+			}
 		};
 
 		Entity::Entity(Reality &r, Location_t const &loc) noexcept
 		: impl{new Impl{r, loc}}
+		{
+			ConstructEvent{*this}.call();
+		}
+		Entity::Entity(Entity const &from) noexcept
+		: impl{from.impl}
 		{
 			ConstructEvent{*this}.call();
 		}
@@ -65,6 +87,10 @@ namespace resplunk
 			return impl->reality();
 		}
 
-		//...
+		auto Entity::location() const noexcept
+		-> Location_t
+		{
+			return impl->location();
+		}
 	}
 }
