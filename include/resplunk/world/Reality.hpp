@@ -1,7 +1,7 @@
 #ifndef resplunk_world_Reality_HeaderPlusPlus
 #define resplunk_world_Reality_HeaderPlusPlus
 
-#include "resplunk/meta/Metadata.hpp"
+#include "resplunk/util/Metadata.hpp"
 #include "resplunk/util/Cloneable.hpp"
 #include "resplunk/event/RAII.hpp"
 
@@ -10,7 +10,7 @@ namespace resplunk
 	namespace world
 	{
 		struct Reality
-		: meta::Metadatable
+		: virtual util::Metadatable
 		, util::CloneImplementor<Reality>
 		{
 			using ConstructEvent = event::Construct<Reality>;

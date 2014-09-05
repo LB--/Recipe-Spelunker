@@ -5,19 +5,28 @@
 RESPLUNK_EVENT(resplunk::world::Entity::ConstructEvent);
 RESPLUNK_EVENT(resplunk::world::Entity::DestructEvent);
 RESPLUNK_EVENT(resplunk::world::Entity::Event);
+RESPLUNK_EVENT(resplunk::world::Entity::RealityChangeEvent);
+RESPLUNK_EVENT(resplunk::world::Entity::LocationChangeEvent);
+RESPLUNK_EVENT(resplunk::world::Entity::TeleportEvent);
 
 namespace resplunk
 {
 	namespace world
 	{
 		struct Entity::Impl final
+		: private event::Reactor<RealityChangeEvent>
+		, private event::Reactor<LocationChangeEvent>
 		{
 			Impl(Reality &r, Location_t const &loc) noexcept
 			: r{r}
 			, loc{loc}
 			{
 			}
-			Impl(Impl const &from) = default;
+			Impl(Impl const &from) noexcept
+			: r{from.r}
+			, loc{from.loc}
+			{
+			}
 			~Impl() noexcept
 			{
 			}
@@ -33,9 +42,24 @@ namespace resplunk
 				return r;
 			}
 
+			auto location() const noexcept
+			-> Location_t
+			{
+				return loc;
+			}
+
 		private:
 			std::reference_wrapper<Reality> r;
 			Location_t loc;
+
+			virtual void react(RealityChangeEvent const &e) noexcept override
+			{
+				r = e.to();
+			}
+			virtual void react(LocationChangeEvent const &e) noexcept override
+			{
+				loc = e.to();
+			}
 		};
 
 		Entity::Entity(Reality &r, Location_t const &loc) noexcept
@@ -47,21 +71,6 @@ namespace resplunk
 		: impl{new Impl{*from.impl}}
 		{
 			ConstructEvent{*this}.call();
-		}
-		auto Entity::operator=(Entity from) noexcept
-		-> Entity &
-		{
-			swap(from);
-			return *this;
-		}
-		Entity::Entity(Entity &&from) noexcept
-		: impl{std::move(from.impl)}
-		{
-		}
-		Entity &Entity::operator=(Entity &&from) noexcept
-		{
-			impl = std::move(from.impl);
-			return *this;
 		}
 		Entity::~Entity() noexcept
 		{
@@ -82,13 +91,10 @@ namespace resplunk
 			return impl->reality();
 		}
 
-		void Entity::swap(Entity &other) noexcept
+		auto Entity::location() const noexcept
+		-> Location_t
 		{
-			return impl.swap(other.impl);
-		}
-		void swap(Entity &a, Entity &b) noexcept
-		{
-			return a.swap(b);
+			return impl->location();
 		}
 	}
 }

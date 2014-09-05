@@ -33,9 +33,10 @@ get_property(RESPLUNK_API_HEADERS GLOBAL PROPERTY RESPLUNK_API_HEADERS)
 get_property(RESPLUNK_API_SOURCES GLOBAL PROPERTY RESPLUNK_API_SOURCES)
 get_property(RESPLUNK_API_DEPENDS GLOBAL PROPERTY RESPLUNK_API_DEPENDS)
 
-add_library          ("resplunk-server-obj" OBJECT ${RESPLUNK_API_SOURCES})
-add_library          ("resplunk-server"     SHARED $<TARGET_OBJECTS:resplunk-server-obj>)
-target_link_libraries("resplunk-server"            ${RESPLINK_API_DEPENDS})
+add_library               ("resplunk-server-obj" OBJECT ${RESPLUNK_API_SOURCES})
+add_library               ("resplunk-server"     SHARED $<TARGET_OBJECTS:resplunk-server-obj>)
+target_link_libraries     ("resplunk-server"            ${RESPLINK_API_DEPENDS})
+target_include_directories("resplunk-server" PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include/")
 
 enable_testing()
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/test/")

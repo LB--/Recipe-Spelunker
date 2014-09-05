@@ -1,7 +1,7 @@
 #ifndef resplunk_world_Voxel_HeaderPlusPlus
 #define resplunk_world_Voxel_HeaderPlusPlus
 
-#include "resplunk/meta/Metadata.hpp"
+#include "resplunk/util/Metadata.hpp"
 #include "resplunk/world/World.hpp"
 #include "resplunk/util/Location.hpp"
 #include "resplunk/util/Optional.hpp"
@@ -13,7 +13,7 @@ namespace resplunk
 	namespace world
 	{
 		struct Voxel final
-		: meta::Metadatable
+		: util::Metadatable
 		{
 			using Location_t = util::Location<std::uintmax_t>;
 			using ConstructEvent = event::Construct<Voxel>;
