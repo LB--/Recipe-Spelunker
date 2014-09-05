@@ -1,10 +1,10 @@
 #undef NDEBUG
 
-#include "resplunk/meta/Metadata.hpp"
+#include "resplunk/util/Metadata.hpp"
 
 #include <cassert>
 
-using Metadatable = resplunk::meta::Metadatable;
+using Metadatable = resplunk::util::Metadatable;
 template<typename... Args>
 using CloneImplementor = resplunk::util::CloneImplementor<Args...>;
 
