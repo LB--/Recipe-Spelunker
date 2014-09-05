@@ -31,34 +31,20 @@ namespace resplunk
 			struct Event
 			: event::Implementor<Event, event::Event>
 			{
-				virtual ~Event() noexcept = 0;
+				virtual ~Event() noexcept = default;
 
-				Entity const &instance() noexcept
-				{
-					return inst;
-				}
-				Entity &instance() const noexcept
-				{
-					return inst;
-				}
+				virtual Entity const &instance() noexcept = 0;
+				virtual Entity &instance() const noexcept = 0;
 
 				template<typename EntityT>
 				using type_for = typename EntityT::Event;
 
 			protected:
-				Event(Entity &inst)
-				: inst(inst)
-				{
-				}
-
-			private:
-				Entity &inst;
+				Event() = default;
 			};
 			struct RealityChangeEvent
 			: event::Implementor<RealityChangeEvent, event::Cancellable, Event>
 			{
-				virtual ~RealityChangeEvent() noexcept = 0;
-
 				Reality const &to() noexcept
 				{
 					return t;
@@ -104,8 +90,6 @@ namespace resplunk
 			struct LocationChangeEvent
 			: event::Implementor<LocationChangeEvent, event::Cancellable, Event>
 			{
-				virtual ~LocationChangeEvent() noexcept = 0;
-
 				Location_t to() const noexcept
 				{
 					return t;
@@ -146,8 +130,6 @@ namespace resplunk
 			struct TeleportEvent
 			: event::Implementor<TeleportEvent, RealityChangeEvent, LocationChangeEvent>
 			{
-				virtual ~TeleportEvent() noexcept = 0;
-
 				template<typename EntityT>
 				using type_for = typename EntityT::TeleportEvent;
 				template<typename EntityT>
@@ -178,10 +160,6 @@ namespace resplunk
 			virtual LocationChangeEvent *new_LocationChangeEvent(Location_t to) noexcept = 0;
 			virtual TeleportEvent *new_TeleportEvent(Reality &rt, Location_t lt) noexcept = 0;
 		};
-		inline Entity::Event::~Event() noexcept = default;
-		inline Entity::RealityChangeEvent::~RealityChangeEvent() noexcept = default;
-		inline Entity::LocationChangeEvent::~LocationChangeEvent() noexcept = default;
-		inline Entity::TeleportEvent::~TeleportEvent() noexcept = default;
 	}
 }
 

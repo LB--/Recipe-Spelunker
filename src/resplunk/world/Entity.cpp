@@ -5,6 +5,9 @@
 RESPLUNK_EVENT(resplunk::world::Entity::ConstructEvent);
 RESPLUNK_EVENT(resplunk::world::Entity::DestructEvent);
 RESPLUNK_EVENT(resplunk::world::Entity::Event);
+RESPLUNK_EVENT(resplunk::world::Entity::RealityChangeEvent);
+RESPLUNK_EVENT(resplunk::world::Entity::LocationChangeEvent);
+RESPLUNK_EVENT(resplunk::world::Entity::TeleportEvent);
 
 namespace resplunk
 {
