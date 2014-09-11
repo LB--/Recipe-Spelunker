@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <map>
 #include <typeinfo>
+#include <typeindex>
 
 namespace resplunk
 {
@@ -17,7 +18,7 @@ namespace resplunk
 
 		struct Factory
 		{
-			using Registration_t = char const *;
+			using Id_t = std::string;
 			Factory() noexcept = default;
 			Factory(Factory const &) = delete;
 			Factory &operator=(Factory const &) = delete;
@@ -28,22 +29,35 @@ namespace resplunk
 			template<typename SerializableT>
 			struct Default;
 
-			template<typename SerializableT, typename FactoryT = Default<SerializableT>>
-			static auto register_for() noexcept
-			-> Registration_t
+			template<typename SerializableT, typename FactoryT = Default<SerializableT>, std::size_t... N>
+			static auto Register(char const (&scope)[N]...) noexcept
+			-> Id_t const &
 			{
-				Registration_t name = typeid(Serializable_t).name();
-				registrar().emplace(name, Registrar_t::mapped_type{new FactoryT});
-				return name;
+				static_assert(sizeof...(N) > 0, "Global scope is reserved");
+				static_assert(first_size<N...> > 0, "The empty scope is reserved for implementation details");
+				auto it = types().emplace(typeid(SeriaizableT), concat(scope...)).first;
+				factories().emplace(Factories_t::key_type{it->second}, Factories_t::mapped_type{new FactoryT});
+				return it->second;
+			}
+			template<typename SerializableT>
+			static auto Id() noexcept
+			-> util::Optional<Id_t const &>
+			{
+				auto it = types().find(typeid(SerializableT));
+				if(it != types().end())
+				{
+					return it->second;
+				}
+				return nullptr;
 			}
 
 			template<typename SerializableT>
 			static auto Reconstruct(ObjectValue const &v) noexcept
 			-> std::unique_ptr<SerializableT>
 			{
-				Registration_t name = typeid(Serializable_t).name();
-				auto it = registrar().find(name);
-				if(it != registrar().end())
+				Id_t const &name = v.factory_id();
+				auto it = factories().find(name);
+				if(it != factories().end())
 				{
 					return std::move(std::unique_ptr<SerializableT>{it.second->reconstruct(v)});
 				}
@@ -51,12 +65,39 @@ namespace resplunk
 			}
 
 		private:
-			using Registrar_t = std::map<char const *, std::unique_ptr<Factory>>;
-			static auto registrar() noexcept
-			-> Registrar_t &
+			template<std::size_t Last>
+			static auto concat(char const (&last)[Last]) noexcept
 			{
-				static Registrar_t r;
+				return last + std::string{'\0'};
+			}
+			template<std::size_t First, std::size_t... Rest>
+			static auto concat(char const (&first)[First], char const (&rest)[Rest]...) noexcept
+			{
+				return first + std::string{'\0'} + concat(rest...);
+			}
+			template<std::size_t First, std::size_t...>
+			static constexpr std::size_t first_size {First};
+
+			struct factories_t_compare final
+			{
+				bool operator<(std::reference_wrapper<Id_t> a, std::reference_wrapper<Id_t> b) const noexcept
+				{
+					return a.get() < b.get();
+				}
+			};
+			using Factories_t = std::map<std::reference_wrapper<Id_t>, std::unique_ptr<Factory>, factories_t_compare>;
+			using Types_t = std::map<std::type_index, Id_t>;
+			static auto factories() noexcept
+			-> Factories_t &
+			{
+				static Factories_t r;
 				return r;
+			}
+			static auto types() noexcept
+			-> Types_t &
+			{
+				static Types_t t;
+				return t;
 			}
 
 			virtual Serializable *reconstruct(ObjectValue const &) const noexcept = 0;
@@ -83,25 +124,7 @@ namespace resplunk
 			friend Serializer;
 			friend ObjectValue;
 
-			virtual Factory::Registration_t factory_id() const noexcept = 0;
-		};
-
-		template<typename SerializableT, typename... ParentT>
-		struct Implementor
-		: virtual Serializable
-		, virtual ParentT...
-		{
-			using Serializable_t = SerializableT;
-			using Implementor_t = Implementor;
-
-		private:
-			friend SerializableT;
-			Implementor() noexcept = default;
-
-			virtual Factory::Registration_t factory_id() const noexcept override
-			{
-				return typeid(Serializable_t).name();
-			}
+			virtual Factory::Id_t const &factory_id() const noexcept = 0;
 		};
 	}
 }

@@ -9,6 +9,7 @@ namespace resplunk
 		{
 			if(auto &&object = s.serialize())
 			{
+				object.factory_id(s.factory_id());
 				serialize(object);
 			}
 		}

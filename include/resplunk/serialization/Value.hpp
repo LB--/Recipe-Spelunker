@@ -19,6 +19,9 @@ namespace resplunk
 {
 	namespace serialization
 	{
+		struct Serializer;
+		struct Factory;
+
 		struct Value
 		: util::CloneImplementor<Value>
 		{
@@ -494,7 +497,7 @@ namespace resplunk
 					ObjectValue &inst;
 					auto operator[](std::string const &n) noexcept
 					{
-						static std::string const scope_str {typeid(SerializableT).name()};
+						static std::string const scope_str {Factory::Id<SerializableT>()};
 						struct Assignable final
 						{
 							ObjectValue &inst;
@@ -524,7 +527,7 @@ namespace resplunk
 					auto operator[](std::string const &n) noexcept
 					-> util::Optional<Value const &>
 					{
-						static std::string const scope_str {typeid(SerializableT).name()};
+						static std::string const scope_str {Factory::Id<SerializableT>()};
 						auto it = inst.values.find(scope_str+'\0'+n);
 						if(it != inst.values.end())
 						{
@@ -536,7 +539,11 @@ namespace resplunk
 				return Helper{*this};
 			}
 
-			//type information...
+			auto factory_id() const noexcept
+			-> util::Optional<Factory::Id_t const &>
+			{
+				return fid;
+			}
 
 			virtual void serialize(Serializer &s) const noexcept override
 			{
@@ -549,10 +556,18 @@ namespace resplunk
 		private:
 			using Values_t = std::map<std::string, util::ClonePtr<Value>>;
 			Values_t values;
+			util::Optional<Factory::Id_t const &> fid;
 
 			virtual ObjectValue *clone() const noexcept override
 			{
 				return new ObjectValue{*this};
+			}
+
+			friend Serializer;
+			friend Factory;
+			void factory_id(Factory::Id_t const &id) noexcept
+			{
+				fid = id;
 			}
 		};
 
