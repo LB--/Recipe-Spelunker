@@ -3,8 +3,6 @@
 
 #include "resplunk/util/Cloneable.hpp"
 #include "resplunk/util/Optional.hpp"
-#include "resplunk/util/LiteralString.hpp"
-#include "resplunk/serialization/Serializer.hpp"
 
 #include <type_traits>
 #include <cstdint>
@@ -19,6 +17,9 @@ namespace resplunk
 {
 	namespace serialization
 	{
+		struct Serializable;
+		struct Target;
+
 		struct Value
 		: util::CloneImplementor<Value>
 		{
@@ -65,8 +66,6 @@ namespace resplunk
 			{
 				return std::move(h);
 			}
-
-			virtual void serialize(Serializer &) const noexcept = 0;
 
 			virtual bool null() const noexcept
 			{
@@ -126,11 +125,6 @@ namespace resplunk
 				return nullptr;
 			}
 
-			virtual void serialize(Serializer &s) const noexcept override
-			{
-				return s.serialize(*this);
-			}
-
 			virtual bool null() const noexcept override
 			{
 				return true;
@@ -159,11 +153,6 @@ namespace resplunk
 			operator Value_t() const noexcept
 			{
 				return v;
-			}
-
-			virtual void serialize(Serializer &s) const noexcept override
-			{
-				return s.serialize(*this);
 			}
 
 			virtual util::Optional<bool> boolean() const noexcept override
@@ -208,11 +197,6 @@ namespace resplunk
 			operator Value_t() const noexcept
 			{
 				return v;
-			}
-
-			virtual void serialize(Serializer &s) const noexcept override
-			{
-				return s.serialize(*this);
 			}
 
 			virtual util::Optional<bool> boolean() const noexcept override
@@ -270,7 +254,7 @@ namespace resplunk
 		, util::CloneImplementor<UnsignedIntValue>
 		{
 			using Value_t = std::uintmax_t;
-			UnsignedIntValue(Value_t v = Value_t{})
+			UnsignedIntValue(Value_t v = Value_t{}) noexcept
 			: v(v)
 			{
 			}
@@ -278,11 +262,6 @@ namespace resplunk
 			operator Value_t() const noexcept
 			{
 				return v;
-			}
-
-			virtual void serialize(Serializer &s) const noexcept override
-			{
-				return s.serialize(*this);
 			}
 
 			virtual util::Optional<bool> boolean() const noexcept override
@@ -340,7 +319,7 @@ namespace resplunk
 		, util::CloneImplementor<RealValue>
 		{
 			using Value_t = long double;
-			RealValue(Value_t v = Value_t{})
+			RealValue(Value_t v = Value_t{}) noexcept
 			: v(v)
 			{
 			}
@@ -348,11 +327,6 @@ namespace resplunk
 			operator Value_t() const noexcept
 			{
 				return v;
-			}
-
-			virtual void serialize(Serializer &s) const noexcept override
-			{
-				return s.serialize(*this);
 			}
 
 			virtual util::Optional<std::intmax_t> signed_int() const noexcept override
@@ -404,7 +378,7 @@ namespace resplunk
 		, util::CloneImplementor<StringValue>
 		{
 			using Value_t = std::string;
-			StringValue(Value_t const &v = Value_t{})
+			StringValue(Value_t const &v = Value_t{}) noexcept
 			: v(v)
 			{
 			}
@@ -412,11 +386,6 @@ namespace resplunk
 			operator Value_t const &() const noexcept
 			{
 				return v;
-			}
-
-			virtual void serialize(Serializer &s) const noexcept override
-			{
-				return s.serialize(*this);
 			}
 
 			virtual util::Optional<bool> boolean() const noexcept override
@@ -478,100 +447,30 @@ namespace resplunk
 			}
 		};
 
-		struct ObjectValue final
-		: virtual Value
-		, util::CloneImplementor<ObjectValue>
-		{
-			ObjectValue() = default;
-			ObjectValue(ObjectValue &&) = default;
-			ObjectValue &operator=(ObjectValue &&) = default;
-
-			template<typename SerializableT>
-			auto as() noexcept
-			{
-				struct Helper final
-				{
-					ObjectValue &inst;
-					auto operator[](std::string const &n) noexcept
-					{
-						static std::string const scope_str {typeid(SerializableT).name()};
-						struct Assignable final
-						{
-							ObjectValue &inst;
-							std::string n;
-							Assignable &operator=(std::nullptr_t) noexcept
-							{
-								inst.values.erase(n);
-								return *this;
-							}
-							Assignable &operator=(Value const &v) noexcept
-							{
-								inst.values.emplace(n, Value::Clone(v));
-								return *this;
-							}
-						};
-						return Assignable{inst, scope_str+'\0'+n};
-					}
-				};
-				return Helper{*this};
-			}
-			template<typename SerializableT>
-			auto as() const noexcept
-			{
-				struct Helper final
-				{
-					ObjectValue &inst;
-					auto operator[](std::string const &n) noexcept
-					-> util::Optional<Value const &>
-					{
-						static std::string const scope_str {typeid(SerializableT).name()};
-						auto it = inst.values.find(scope_str+'\0'+n);
-						if(it != inst.values.end())
-						{
-							return *(it->second);
-						}
-						return nullptr;
-					}
-				};
-				return Helper{*this};
-			}
-
-			//type information...
-
-			virtual void serialize(Serializer &s) const noexcept override
-			{
-				return s.serialize(*this);
-			}
-
-		protected:
-			ObjectValue(ObjectValue const &) = default;
-
-		private:
-			using Values_t = std::map<std::string, util::ClonePtr<Value>>;
-			Values_t values;
-
-			virtual ObjectValue *clone() const noexcept override
-			{
-				return new ObjectValue{*this};
-			}
-		};
-
 		struct ListValue final
 		: virtual Value
 		, util::CloneImplementor<ListValue>
 		{
-			ListValue() = default;
+			using List_t = std::vector<util::ClonePtr<Value>>;
+			ListValue() noexcept = default;
 
-			//
+			operator List_t &() noexcept //temporary
+			{
+				return list;
+			}
+			operator List_t const &() const noexcept //temporary
+			{
+				return list;
+			}
 
 			bool homologous() const noexcept
 			{
 				if(list.size() > 0)
 				{
-					auto &t = typeid(list.at(0));
+					auto &t = typeid(*list.front());
 					for(v : list)
 					{
-						if(t != typeid(v))
+						if(t != typeid(*v))
 						{
 							return false;
 						}
@@ -580,16 +479,10 @@ namespace resplunk
 				return true;
 			}
 
-			virtual void serialize(Serializer &s) const noexcept override
-			{
-				return s.serialize(*this);
-			}
-
 		protected:
 			ListValue(ListValue const &) = default;
 
 		private:
-			using List_t = std::vector<util::ClonePtr<Value>>;
 			List_t list;
 
 			virtual ListValue *clone() const noexcept override
@@ -602,24 +495,76 @@ namespace resplunk
 		: virtual Value
 		, util::CloneImplementor<MapValue>
 		{
-			MapValue() = default;
+			MapValue() noexcept = default;
 
-			//
-
-			virtual void serialize(Serializer &s) const noexcept override
+			auto operator[](std::string const &key) noexcept
 			{
-				return s.serialize(*this);
+				struct Assignable final
+				{
+					MapValue &inst;
+					std::string const key;
+					Assignable &operator=(std::nullptr_t) noexcept
+					{
+						inst.map.erase(key);
+						return *this;
+					}
+					Assignable &operator=(Value const &v) noexcept
+					{
+						inst.map.emplace(key, Value::Clone(v));
+						return *this;
+					}/*
+					Assignable &operator=(Value &&v) noexcept
+					{
+						inst.map.emplace(key, std::move(v)); //won't work, implement fix in Cloneable
+						return *this;
+					}*/
+				};
+				return Assignable{*this, key};
+			}
+			auto operator[](std::string const &key) const noexcept
+			-> util::Optional<Value const &>
+			{
+				auto it = map.find(key);
+				if(it != std::end(map))
+				{
+					return *(it->second);
+				}
+				return nullptr;
 			}
 
 		protected:
 			MapValue(MapValue const &) = default;
 
 		private:
-			//
+			using Map_t = std::map<std::string, util::ClonePtr<Value>>;
+			Map_t map;
 
 			virtual MapValue *clone() const noexcept override
 			{
 				return new MapValue{*this};
+			}
+		};
+
+		struct ObjectValue final
+		: virtual Value
+		, util::CloneImplementor<ObjectValue>
+		{
+			ObjectValue(Serializable const &) noexcept;
+			virtual ~ObjectValue() noexcept;
+
+			Target &target() noexcept;
+			Target const &target() const noexcept;
+
+		protected:
+			ObjectValue(ObjectValue const &);
+
+		private:
+			struct Impl;
+			std::unique_ptr<Impl> impl;
+
+			virtual ObjectValue *clone() const noexcept override
+			{
+				return new ObjectValue{*this};
 			}
 		};
 	}

@@ -33,8 +33,6 @@ namespace resplunk
 			struct Event
 			: event::Implementor<Event, event::Event>
 			{
-				virtual ~Event() noexcept = default;
-
 				virtual Entity const &instance() noexcept = 0;
 				virtual Entity &instance() const noexcept = 0;
 
@@ -42,7 +40,7 @@ namespace resplunk
 				using type_for = typename EntityT::Event;
 
 			protected:
-				Event() = default;
+				Event() noexcept = default;
 			};
 			struct RealityChangeEvent
 			: event::Implementor<RealityChangeEvent, event::Cancellable, Event>
