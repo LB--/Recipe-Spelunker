@@ -2,6 +2,7 @@
 #define resplunk_util_Metadatable_HeaderPlusPlus
 
 #include "resplunk/util/Cloneable.hpp"
+#include "resplunk/serialization/Serializable.hpp"
 
 #include <type_traits>
 #include <utility>
@@ -15,9 +16,11 @@ namespace resplunk
 	{
 		template<typename T>
 		struct Metadata final
+		: serialization::Serializable
 		{
 			static_assert(std::is_base_of<util::Cloneable, T>::value, "T must be Cloneable");
-			Metadata() = default;
+			static_assert(std::is_base_of<serialization::Serializable, T>::value, "T must be Serializable");
+			Metadata() noexcept = default;
 			Metadata(Metadata const &m) noexcept
 			: t{m.t? std::move(T::Clone(*m.t)) : nullptr}
 			{
@@ -58,22 +61,31 @@ namespace resplunk
 				return std::move(t);
 			}
 
-			void swap(Metadata &other) & noexcept
+			struct SerializeEvent final
+			: event::Implementor<SerializeEvent, Serializable::SerializeEvent>
 			{
-				return t.swap(other.t);
-			}
-			friend void swap(Metadata &a, Metadata &b) noexcept
-			{
-				return a.swap(b);
-			}
+				virtual Metadata const &instance() noexcept override
+				{
+					return inst;
+				}
 
-			friend bool operator==(Metadata const &a, Metadata const &b) noexcept
-			{
-				return std::addressof(a) == std::addressof(b);
-			}
+			private:
+				Metadata const &inst;
+				friend Metadata;
+				SerializeEvent(Metadata const &inst, serialization::Target &target)
+				: Serializable::SerializeEvent(target)
+				, inst(inst)
+				{
+				}
+			};
 
 		private:
 			std::unique_ptr<T> t {nullptr};
+
+			virtual SerializeEvent *new_SerializeEvent(serialization::Target &target) const noexcept override
+			{
+				return new SerializeEvent{*this, target};
+			}
 		};
 
 		struct Metadatable
@@ -119,15 +131,6 @@ namespace resplunk
 			void remove() noexcept
 			{
 				data.erase(typeid(T));
-			}
-
-			void swap(Metadatable &other) noexcept
-			{
-				return data.swap(other.data);
-			}
-			friend void swap(Metadatable &a, Metadatable &b) noexcept
-			{
-				return a.swap(b);
 			}
 
 		private:
