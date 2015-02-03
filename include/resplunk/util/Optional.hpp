@@ -71,7 +71,7 @@ namespace resplunk
 			}
 
 		private:
-			char data[sizeof(T)];
+			alignas(T) char data[sizeof(T)];
 			bool valid = false;
 		};
 		template<typename T>
